@@ -95,12 +95,12 @@ fun AppNavigation(
         composable(
             route=AppScreens.DetailCatScreen.route+"/{reference_image_id}",
             arguments = listOf(
-                navArgument(name="reference_image_id"){type= NavType.StringType})
+                navArgument(name="idCat"){type= NavType.IntType})
         )
         {
-            val referenceImageId:String?=it.arguments?.getString("reference_image_id")
-            requireNotNull(referenceImageId, { "No puede ser nulo" })
-            DetailCatScreen(navController,catsViewModel,referenceImageId,favoritesViewModel)
+            val idCat:Int?=it.arguments?.getInt("idCat")
+            requireNotNull(idCat, { "No puede ser nulo" })
+            DetailCatScreen(navController,catsViewModel,idCat,favoritesViewModel)
         }
 
 

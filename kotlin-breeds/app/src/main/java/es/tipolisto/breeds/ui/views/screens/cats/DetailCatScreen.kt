@@ -55,6 +55,7 @@ import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
 import es.tipolisto.breeds.data.models.cat.Cat
+import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.ui.components.RatingBar
 import es.tipolisto.breeds.ui.navigation.AppScreens
@@ -67,12 +68,12 @@ import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 fun DetailCatScreen(
     navController: NavController,
     catsViewModel: CatsViewModel,
-    referenceImageId:String,
+    idCat:Int,
     favoritesViewModel: FavoritesViewModel
 ){
-    val cat = catsViewModel.getCatByImageCat(referenceImageId)
+    val cat = catsViewModel.getCatById(idCat)
     //Le ponemos si está en la lista de favoritos o no
-    favoritesViewModel.checkIsInFavorites(cat?.id?:"")
+    favoritesViewModel.checkIsInFavorites(cat?.id?:0)
     //val isFavorite=favoritesViewModel.isFavorite
     val isFavorite: Boolean by favoritesViewModel.isFavorite.observeAsState(initial = false)
     val context= LocalContext.current
@@ -130,7 +131,7 @@ fun DetailCatScreen(
             }
 
         ) {
-            val cat = catsViewModel.getCatByImageCat(referenceImageId)
+            val cat = catsViewModel.getCatById(idCat)
             if (cat == null) navController.navigate(AppScreens.ListCatsScreen.route)
              Card(
                 modifier = Modifier
@@ -163,8 +164,8 @@ private fun getDetail(cat: Cat):String{
 }
 
 @Composable
-fun CatImageDetail(cat: Cat?){
-    val url = cat?.image?.url
+fun CatImageDetail(cat: CatTL?){
+    val url = cat?.path_image
     val model by remember { mutableStateOf(url) }
     AsyncImage(
         model = model,
@@ -195,13 +196,13 @@ fun createLink(text:String){
 }
 
 @Composable
-fun CatDescriptionDetail(cat: Cat?){
+fun CatDescriptionDetail(cat: CatTL?){
     if (cat != null) {
         Text( text = cat.name + ".", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center, modifier=Modifier.fillMaxWidth())
-        Text( text = getDetail(cat = cat) + ".", style = MaterialTheme.typography.bodyMedium)
+        //Text( text = getDetail(cat = cat) + ".", style = MaterialTheme.typography.bodyMedium)
         //Text(text = cat.wikipedia_url + ".")
-        createLink(cat.wikipedia_url)
-        Spacer(modifier = Modifier.size(10.dp))
+        //createLink(cat.wikipedia_url)
+        /*Spacer(modifier = Modifier.size(10.dp))
         Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             //Con modifier.wight le decimos que vamos a tener 2 huecos a reparti con 1f le decimos que uno cada uno
             Text(text = stringResource(id = R.string.cat_indoor), modifier=Modifier.weight(1f))
@@ -304,6 +305,6 @@ fun CatDescriptionDetail(cat: Cat?){
             RatingBar(cat.short_legs.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
-        }
+        }*/
     }
 }

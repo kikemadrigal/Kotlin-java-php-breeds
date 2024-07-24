@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModel
 import es.tipolisto.breeds.data.database.favorites.FavoritesDao
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
 import es.tipolisto.breeds.data.models.cat.Cat
+import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.models.dog.Dog
+import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.fish.Fish
 import es.tipolisto.breeds.data.repositories.FavoritesRepository
 import es.tipolisto.breeds.ui.states.FavoritesScreenState
@@ -54,16 +56,16 @@ class FavoritesViewModel(private val favoritesDao: FavoritesDao): ViewModel() {
     }
 
 
-    fun createFavorite(cat: Cat){
+    fun createFavorite(cat: CatTL){
         //Creamos el favorito a partir del idBreed
-        val favorite=FavoritesEntity(null, cat.id, cat.name, "Cat", cat.image.url,cat.description, Date().toString())
+        val favorite=FavoritesEntity(null, cat.id.toString(), cat.name, "Cat", cat.path_image,cat.description, Date().toString())
         //val favorite= FavoritesRepository.getById(context,id)
         FavoritesRepository.insert(favoritesDao,favorite)
         //FavoritesRepository.insert(context,favorite)
         //Log.d("TAG","FisViewModel die: preparada el id: "+idBreed+"para añadir a favoritos a "+favorite.toString())
     }
-    fun createFavorite(dog: Dog){
-        val favorite=FavoritesEntity(null, dog.id.toString(), dog.name, "Dog", dog.imageDog?.url?:"Not image",dog.bred_for, Date().toString())
+    fun createFavorite(dog: DogTL){
+        val favorite=FavoritesEntity(null, dog.id.toString(), dog.name, "Dog", dog.path_image?:"Not image",dog.breed_id, Date().toString())
         FavoritesRepository.insert(favoritesDao,favorite)
     }
     fun createFavorite(fish: Fish?){
@@ -73,9 +75,13 @@ class FavoritesViewModel(private val favoritesDao: FavoritesDao): ViewModel() {
         }
     }
 
-    fun checkIsInFavorites(idAnimal:String){
+    fun checkIsInFavorites(id:Int){
         _isFavorite.value=false
-        _isFavorite.value=FavoritesRepository.isFavorite(favoritesDao,idAnimal)
+        _isFavorite.value=FavoritesRepository.isFavorite(favoritesDao,id.toString())
+    }
+    fun checkIsInFavorites(id:String){
+        _isFavorite.value=false
+        _isFavorite.value=FavoritesRepository.isFavorite(favoritesDao,id)
     }
 
     fun setFavorite(isFavorite:Boolean){
@@ -83,9 +89,11 @@ class FavoritesViewModel(private val favoritesDao: FavoritesDao): ViewModel() {
     }
 
 
+    fun getFavoritesByIdAnimal(idAnimal:Int):List<FavoritesEntity>{
+        return FavoritesRepository.getByIdAnimal(favoritesDao,idAnimal.toString())
+    }
     fun getFavoritesByIdAnimal(idAnimal:String):List<FavoritesEntity>{
         return FavoritesRepository.getByIdAnimal(favoritesDao,idAnimal)
-
     }
 
     fun delete(favoritesEntity: FavoritesEntity) {

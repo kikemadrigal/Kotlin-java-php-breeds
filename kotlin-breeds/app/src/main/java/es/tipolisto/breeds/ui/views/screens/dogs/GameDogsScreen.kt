@@ -70,7 +70,7 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, me
 
     LaunchedEffect(key1 = true) {
         if (!dogsViewModel.justOnce) {
-            dogsViewModel.loadAndInsertBuffer()
+
             dogsViewModel.get3RamdomDogs()
             dogsViewModel.justOnce = true
         }
@@ -183,7 +183,7 @@ fun DogHud(dogsViewModel: DogsViewModel){
 @Composable
 fun DrawImageDog(dogsViewModel: DogsViewModel){
     val dog=dogsViewModel.getActiveDog()
-    if(dog==null || dog.imageDog?.url==null ){
+    if(dog==null || dog.path_image==null ){
         Image(
             painter = painterResource(id = R.drawable.without_image),
             contentDescription = "Splash breeds",
@@ -195,7 +195,7 @@ fun DrawImageDog(dogsViewModel: DogsViewModel){
     }else{
         //dogsViewModel.stateIsLoading=true
         AsyncImage(
-            model = dog.imageDog?.url,
+            model = "https://breeds.tipolisto.es/"+dog.path_image,
             contentDescription = "Select a breed",
             modifier = Modifier
                 .size(400.dp, 300.dp)

@@ -17,6 +17,7 @@ import es.tipolisto.breeds.data.database.AppDataBaseClient
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
 import es.tipolisto.breeds.data.database.records.RecordDao
 import es.tipolisto.breeds.data.models.cat.Cat
+import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.providers.CatProvider
 import es.tipolisto.breeds.data.repositories.CatRepository
@@ -60,13 +61,13 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
         state.score=0
     }
 
-    fun getAll():List<Cat>{
+    fun getAll():List<CatTL>{
         return CatProvider.listCats
     }
     fun get3RamdomCats(){
         viewModelScope.launch {
             if (clickPressed)delay(2000)
-            val listRandomCats= mutableListOf<Cat?>(null, null, null)
+            val listRandomCats= mutableListOf<CatTL?>(null, null, null)
             listRandomCats[0] = CatRepository.getRandomCatFromBuffer(listRandomCats)
             listRandomCats[1] = CatRepository.getRandomCatFromBuffer(listRandomCats)
             listRandomCats[2] = CatRepository.getRandomCatFromBuffer(listRandomCats)
@@ -78,11 +79,11 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
             //Log.d("TAG", "CatViewModel: cat 1->${stateListRandomCats[0]?.name}, ${stateListRandomCats[0]?.reference_image_id}")
             //Log.d("TAG", "CatViewModel: cat 2->${stateListRandomCats[1]?.name}, ${stateListRandomCats[1]?.reference_image_id}")
             //Log.d("TAG", "CatViewModel: cat 3->${stateListRandomCats[2]?.name}, ${stateListRandomCats[2]?.reference_image_id}")
-            Log.d("TAG", "CatViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomCats[state.correctAnswer]?.name}, ${state.listRandomCats[state.correctAnswer]?.reference_image_id}")
+            Log.d("TAG", "CatViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomCats[state.correctAnswer]?.name}")
         }
     }
     //getActiveCat:Solo usada para obtener la imagen
-    fun getActiveCat(): Cat?{
+    fun getActiveCat(): CatTL?{
         return state.listRandomCats[state.correctAnswer]
     }
 
@@ -101,9 +102,13 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
     }
 
 
-    fun getCatByImageCat(referenceImageId:String):Cat?{
+    /*un getCatByImageCat(referenceImageId:String):Cat?{
         Log.d("TAG", "CatViewModel dice: Vamos a ver hay un gato con este breed id "+referenceImageId)
         return CatRepository.getCatFromIdImageCatInBuffer(referenceImageId)
+    }*/
+    fun getCatById(id:Int):CatTL?{
+        Log.d("TAG", "CatViewModel dice: Vamos a ver hay un gato con este breed id "+id)
+        return CatRepository.getCatFromIdFromBuffer(id)
     }
 }
 

@@ -1,16 +1,27 @@
 package es.tipolisto.breeds.ui.views.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.invalidateGroupsWithKey
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.repositories.CatRepository
@@ -22,28 +33,42 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(navController:NavController){
-    Splash()
+    var status=""
+
     //MyCircularProgressIndicator(isDisplayed = true)
     LaunchedEffect(key1 = true ){
-        delay(1000)
-        /*
+        //delay(1000)
+
         CatRepository.loadCatsAndInsertBuffer()
+        status="Loading cats from internet"
+        CatRepository.loadBreedCatsAndInsertBuffer()
+        status="Loading brred cats from internet"
         DogRepository.loadDogAndInsertBuffer()
-        FishRepository.loadFishAndInsertBuffer()
-        */
+        status="Loading dogs"
+        //FishRepository.loadFishAndInsertBuffer()
+        status="Loading species"
         //Antes de navegar limpiamos la pila de ventanas para que no vuelva a salir el splash
         navController.popBackStack()
         navController.navigate(AppScreens.MenuScreen.route)
     }
+    Splash(status)
 }
 @Composable
-fun Splash(){
+fun Splash(status:String){
     Column (modifier = Modifier.padding(0.dp)){
         Image(
             painter = painterResource(id = R.drawable.splash_screen),
             contentDescription = "Splash breeds",
-            Modifier.fillMaxSize(),
+            Modifier.fillMaxWidth().height(500.dp),
             contentScale = ContentScale.FillBounds
+        )
+        Text(
+            text = status,
+            Modifier.background(color = Color.Blue)
+                .fillMaxSize(),
+            color = Color.White,
+            fontSize = 24.sp,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -51,7 +76,7 @@ fun Splash(){
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun SplashScreenPreview(){
-    Splash()
+    Splash(status = "Loading")
 }
 
 

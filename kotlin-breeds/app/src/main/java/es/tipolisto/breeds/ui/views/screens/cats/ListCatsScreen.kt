@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.models.cat.Cat
+import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.providers.CatProvider
 import es.tipolisto.breeds.ui.navigation.AppScreens
@@ -102,13 +103,13 @@ fun ListCatsScreenPreview() {
 
 
 @Composable
-fun ListIntemRow(cat: Cat, navController: NavController){
+fun ListIntemRow(cat: CatTL, navController: NavController){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
             .clickable{
-                navController.navigate(AppScreens.DetailCatScreen.route + "/${cat.reference_image_id}")
+                navController.navigate(AppScreens.DetailCatScreen.route + "/${cat.id}")
             },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -126,9 +127,9 @@ fun ListIntemRow(cat: Cat, navController: NavController){
 }
 
 @Composable
-fun CatImage(cat: Cat){
+fun CatImage(cat: CatTL){
     //Image(painter= rememberAsyncImagePainter(request="https://loremflickr.com/100/100"), contentDescription = null )
-    var url=cat.image?.url
+    var url="https://breeds.tipolisto.es/"+cat.path_image
     var model by remember { mutableStateOf(url) }
     AsyncImage(
         model = model,

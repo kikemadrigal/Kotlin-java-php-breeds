@@ -56,6 +56,7 @@ import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.database.records.RecordEntity
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.data.repositories.CatRepository
 import es.tipolisto.breeds.data.repositories.RecordsRepository
 import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
@@ -77,7 +78,6 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
     //Esto es para que solo se ejecute 1 vez
     LaunchedEffect(key1 = true){
         if (!catsViewModel.justOnce) {
-            catsViewModel.loadAndInsertBuffer()
             catsViewModel.get3RamdomCats()
             catsViewModel.justOnce=true
         }
@@ -223,7 +223,7 @@ fun Hud(catsViewModel: CatsViewModel){
 fun DrawImageCat(catsViewModel: CatsViewModel){
     //Cuando se ontenga el gato activo se repintará la imagen
     val cat= catsViewModel.getActiveCat()
-    if(cat?.image == null){
+    if(cat?.path_image == null){
         Image(
             painter = painterResource(id = R.drawable.without_image),
             contentDescription = "Without image",
@@ -235,7 +235,7 @@ fun DrawImageCat(catsViewModel: CatsViewModel){
     }else{
         catsViewModel.stateIsloading=true
         AsyncImage(
-            model = cat.image.url,
+            model = "https://breeds.tipolisto.es/"+cat.path_image,
             contentDescription = "Select a breed",
             modifier = Modifier
                 .height(300.dp)
@@ -273,14 +273,16 @@ fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
                 catsViewModel.get3RamdomCats()
             }
         ){
-            val text=(i+1).toString()+")  "+ catsViewModel.state.listRandomCats[i]?.name+"."
+            val breedCat=catsViewModel.state.listRandomCats[i]?.breed_id
+            val breedCatName=CatRepository.getBreedCatNameByIdCat(breedCat)
+            val text=(i+1).toString()+")  "+ breedCatName+"."
             if(catsViewModel.clickPressed){
                 Text(
                     text = text,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color=if(correctAnswer==i)Color.Black else Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier= Modifier
                         .fillMaxWidth()
                         .background(if (correctAnswer == i) Color.Green else Color.Red)
@@ -291,7 +293,7 @@ fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
                     maxLines = 1,
                     //Esto añade 3 puntos al final para definir que hay más textp
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground ,
                     modifier=Modifier
                             .fillMaxWidth()

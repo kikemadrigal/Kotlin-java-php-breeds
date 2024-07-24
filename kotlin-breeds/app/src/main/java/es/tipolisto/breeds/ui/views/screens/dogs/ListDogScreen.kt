@@ -49,6 +49,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.models.dog.Dog
+import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.fish.Fish
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.providers.DogProvider
@@ -108,13 +109,13 @@ fun ListFishScreenPreview() {
 
 
 @Composable
-fun ListIntemRow(dog: Dog, navController: NavController){
+fun ListIntemRow(dog: DogTL, navController: NavController){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
             .clickable {
-                navController.navigate(AppScreens.DetailDogScreen.route + "/${dog.reference_image_id}")
+                navController.navigate(AppScreens.DetailDogScreen.route + "/${dog.breed_id}")
             },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -134,8 +135,8 @@ fun ListIntemRow(dog: Dog, navController: NavController){
 
 
 @Composable
-fun DogImage(dog: Dog){
-    val url=dog.imageDog?.url
+fun DogImage(dog: DogTL){
+    val url=dog.path_image
     if(url!="Not image"){
         val model by remember { mutableStateOf(url) }
         AsyncImage(
@@ -150,10 +151,10 @@ fun DogImage(dog: Dog){
 }
 
 @Composable
-fun getDogContent(dog:Dog):String{
+fun getDogContent(dog:DogTL):String{
     return stringResource(id = R.string.dog_bred_for)+
-            ": "+ dog.bred_for + "\n"+
+            ": "+ dog.name + "\n"+
             stringResource(id = R.string.dog_breed_group)+
-            ": "+dog.breed_group
+            ": "+dog.description_es
 
 }

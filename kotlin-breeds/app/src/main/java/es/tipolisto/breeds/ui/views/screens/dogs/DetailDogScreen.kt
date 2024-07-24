@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.models.dog.Dog
+import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.ui.components.MyToast
 import es.tipolisto.breeds.ui.navigation.AppScreens
@@ -114,7 +115,7 @@ fun DetailDogScreen(
             }
         ) {
             val dog = dogsViewModel.getDogByReferenceImageId(reference_image_id)
-            val url=dog?.imageDog?.url
+            val url=dog?.path_image
             var model by remember { mutableStateOf(url) }
             Card(
                 modifier = Modifier
@@ -162,16 +163,16 @@ fun DetailDogScreenContent(it:PaddingValues, dog: Dog){
 }
 
 @Composable
-private fun getDetailDog(dog: Dog):String{
-    var content: String =  dog.bred_for+ "\n"
-    content +=
-        stringResource(id = R.string.dog_bred_for)+": "+ dog.bred_for + "\n"+
-        stringResource(id = R.string.dog_breed_group)+": "+dog.breed_group+ "\n"+
+private fun getDetailDog(dog: DogTL):String{
+    var content: String =  dog.name+ "\n"
+    /*content +=
+        stringResource(id = R.string.dog_bred_for)+": "+ dog.name + "\n"+
+        stringResource(id = R.string.dog_breed_group)+": "+dog.family+ "\n"+
         stringResource(id = R.string.dog_life_span)+": "+dog.life_span + "\n" +
         stringResource(id = R.string.dog_temperament)+": "+dog.temperament + "\n" +
         stringResource(id = R.string.dog_origin)+": "+dog.origin + "\n"+
         stringResource(id = R.string.dog_weight)+": "+dog.weight + "\n"+
-        stringResource(id = R.string.dog_height)+": "+dog.height + "\n"
+        stringResource(id = R.string.dog_height)+": "+dog.height + "\n"*/
     return content
 }
 

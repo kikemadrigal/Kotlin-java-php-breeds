@@ -4,12 +4,16 @@ import es.tipolisto.breeds.data.models.cat.BreedCatTL
 import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.models.cat.ImageCat
+import es.tipolisto.breeds.data.models.dog.BreedDogTL
+import es.tipolisto.breeds.data.models.dog.DogTL
+import es.tipolisto.breeds.data.models.dog.ImageDog
 
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
-interface ICatApiService {
+interface IApiService {
 
 
     /*
@@ -120,4 +124,20 @@ interface ICatApiService {
 
     @GET("images/{reference_image_id}")
     suspend fun getImageCat(@Path ("reference_image_id") reference_image_id:String): Response<ImageCat>
+
+
+
+
+
+
+    @GET("breedDogs.php")
+    suspend fun getListBreedDogs():Response<List<BreedDogTL>>
+
+    @GET("dogs.php")
+    suspend fun getListDogs():Response<List<DogTL>>
+
+    //Devuelve una imagen de un perro a partir del breed_id
+    //https://api.thedogapi.com/v1/images/search?bree_id=HJ7Pzg5EQ
+    @GET("images/search")
+    suspend fun getDataDogBreedById(@Query("bree_id") reference_image_id:String):Response<List<ImageDog>>
 }

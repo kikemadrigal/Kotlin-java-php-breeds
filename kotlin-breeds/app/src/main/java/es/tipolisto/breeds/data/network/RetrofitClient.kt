@@ -18,20 +18,26 @@ class RetrofitClient{
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
         }
-        // .addConverterFactory(ScalarsConverterFactory.create())
-        fun getRetrofitCatService():ICatApiService{
+        fun getRetrofitService():IApiService{
             val gson = GsonBuilder()
                 .create()
-            val retrofit=createRetrofit(Constants.URL_BASE_CAT,gson)
-            return retrofit.create(ICatApiService::class.java)
+            val retrofit=createRetrofit(Constants.URL_BASE,gson)
+            return retrofit.create(IApiService::class.java)
         }
-        fun getRetroDogService():IDogApiService{
+        // .addConverterFactory(ScalarsConverterFactory.create())
+        /*fun getRetrofitCatService():ICatApiService{
+            val gson = GsonBuilder()
+                .create()
+            val retrofit=createRetrofit(Constants.URL_BASE,gson)
+            return retrofit.create(ICatApiService::class.java)
+        }*/
+        /*fun getRetroDogService():IDogApiService{
             val gson = GsonBuilder()
                 .registerTypeAdapter(Dog::class.java, DogDeserializer())
                 .create()
             val retrofit=createRetrofit(Constants.URL_BASE_DOG, gson)
             return retrofit.create(IDogApiService::class.java)
-        }
+        }*/
         fun getRetrofitFishService():IFishApiService{
             val gson = GsonBuilder()
                 .registerTypeAdapter(Fish::class.java, FishDeserializer())

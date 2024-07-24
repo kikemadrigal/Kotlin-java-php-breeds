@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
 import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.dog.Dog
+import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.providers.CatProvider
 import es.tipolisto.breeds.data.providers.DogProvider
 import es.tipolisto.breeds.data.repositories.DogRepository
@@ -46,14 +47,14 @@ class DogsViewModel: ViewModel() {
         state.lives=5
         state.score=0
     }
-    fun getAll():List<Dog>{
+    fun getAll():List<DogTL>{
         return DogProvider.listDogs
     }
 
     fun get3RamdomDogs(){
         viewModelScope.launch {
             if (clickPressed) delay(2000)
-            val listRandomDogs= mutableListOf<Dog?>(null, null, null)
+            val listRandomDogs= mutableListOf<DogTL?>(null, null, null)
             listRandomDogs[0] = DogRepository.getRandomDogFromBuffer(listRandomDogs)
             listRandomDogs[1] = DogRepository.getRandomDogFromBuffer(listRandomDogs)
             listRandomDogs[2] = DogRepository.getRandomDogFromBuffer(listRandomDogs)
@@ -67,11 +68,11 @@ class DogsViewModel: ViewModel() {
             Log.d("TAG", "DogViewModel: dog 3->${stateListRandomDogs[2]?.name}, ${stateListRandomDogs[2]?.reference_image_id}")
 */
 
-            Log.d("TAG", "DogViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomDogs[state.correctAnswer]?.name}, ${state.listRandomDogs[state.correctAnswer]?.reference_image_id}")
+            Log.d("TAG", "DogViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomDogs[state.correctAnswer]?.name}")
         }
     }
 
-    fun getActiveDog(): Dog?{
+    fun getActiveDog(): DogTL?{
         return state.listRandomDogs[state.correctAnswer]
     }
 
@@ -96,7 +97,7 @@ class DogsViewModel: ViewModel() {
 
     }
 
-    fun getDogByReferenceImageId(referenceImageId:String):Dog?{
+    fun getDogByReferenceImageId(referenceImageId:String):DogTL?{
         Log.d("TAG", "DogViewModel dice: Vamos a ver hay un gato con este breed id "+referenceImageId)
         return DogRepository.getDogFromBreedIdInBuffer(referenceImageId)
     }
