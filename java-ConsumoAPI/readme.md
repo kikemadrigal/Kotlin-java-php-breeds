@@ -1,0 +1,1 @@
+1.Copia el archivo "Constants.java" enla carpeta "./src/main/java/com/mycompany/consumoapi/utils
