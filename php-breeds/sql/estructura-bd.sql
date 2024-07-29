@@ -209,13 +209,11 @@ CREATE TABLE `specie_fish` (
   `morphology` text,
   `habitat` text,
   `feeding` text,
-
   `phylum` varchar(255),
   `class` varchar(255),
   `orden` varchar(255),
   `family` varchar(255),
   `genus` varchar(255),
-
   `path_image`varchar(255),
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `creator_id` int(11),
@@ -292,7 +290,7 @@ CREATE TABLE `fish` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(255),
   `name_es` varchar(255),
-  `specie_id` varchar(255),
+  `specie_id` int(10),
   `path_image` varchar(255),
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `creator_id` int(11),
@@ -300,6 +298,64 @@ CREATE TABLE `fish` (
 	PRIMARY KEY (`id`),
   FOREIGN KEY (`creator_id`) REFERENCES users(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 			Estructura de tabla para la tabla `scores`
+--
+
+-- --------------------------------------------------------
+
+CREATE TABLE `scores` (
+  `id` int(10) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `score` int(10) DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  UNIQUE KEY `ID` (`id`),
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;
+
+--
+-- Volcado de datos para la tabla `scores`
+--
+
+INSERT INTO `scores` (`id`, `name`, `score`, `date`) VALUES
+(10, 'Jhon', 56, '2024-07-29 04:08:48'),
+(12, 'ada', 166, '2022-08-19 20:59:16'),
+(18, 'Kike', 198, '2024-07-29 04:08:59');
+
+
+
+-- --------------------------------------------------------
+
+--
+-- 			Estructura de tabla para la tabla `beauties`
+--
+
+-- --------------------------------------------------------
+
+CREATE TABLE `beauties` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255),
+  `type` varchar(255),
+  `breed` varchar(255),
+  `family` varchar(255),
+  `description` text,
+  `year_of_birth` varchar(255),
+  `sex` tinyint,
+  `address` varchar(255),
+  `vaccines` int(10) DEFAULT 0,
+  `path_image` varchar(255),
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `creator_id` int(11),
+  UNIQUE KEY `ID` (`id`),
+	PRIMARY KEY (`id`),
+  FOREIGN KEY (`creator_id`) REFERENCES users(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;
+
+
+
 
 
 -- --------------------------------------------------------

@@ -39,10 +39,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.models.fish.Fish
+import es.tipolisto.breeds.data.models.fish.FishTL
+import es.tipolisto.breeds.data.models.fish.SpecieFishTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
+import es.tipolisto.breeds.utils.Constants
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +78,7 @@ fun ListFishScreen(navController:NavController,fishViewModel: FishViewModel) {
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val datos = fishViewModel.getAll()
+                val datos = fishViewModel.getAllSpeciesFish()
                items(datos) { item ->
                     ListIntemRow(item, navController)
                 }
@@ -94,13 +97,13 @@ fun ListFishScreenPreview() {
 
 //
 @Composable
-fun ListIntemRow(fish: Fish, navController: NavController){
+fun ListIntemRow(specie: SpecieFishTL, navController: NavController){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
             .clickable{
-                navController.navigate(AppScreens.DetailFishScreen.route + "/${fish.id}")
+                navController.navigate(AppScreens.DetailFishScreen.route + "/${specie.id}")
             },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -111,18 +114,20 @@ fun ListIntemRow(fish: Fish, navController: NavController){
             modifier=Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            FishImage(fish)
+            FishImage(specie)
+            var descrpition=specie.description
+            if(descrpition.length>100) descrpition=descrpition.substring(0,100)+"..."
             //Text(text = ""+fish.img_src_set, color= Color.White, fontSize = 20.sp )
-            Text(text = fish.name, style = MaterialTheme.typography.headlineLarge)
+            Text(text = specie.name_es, style = MaterialTheme.typography.headlineLarge)
             //Text(text = fish.urlWiki, color= Color.White, fontSize = 20.sp )
-            Text(text = fish.meta.toString(), style = MaterialTheme.typography.bodyLarge)
+            Text(text = descrpition, style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
 
 @Composable
-fun FishImage(fish: Fish){
-    val url=fish.img_src_set
+fun FishImage(specie: SpecieFishTL){
+    val url=Constants.URL_BASE_IMAGES_TIPOLISTO_ES+specie.path_image
     val model by remember { mutableStateOf(url) }
     AsyncImage(
         model = model,

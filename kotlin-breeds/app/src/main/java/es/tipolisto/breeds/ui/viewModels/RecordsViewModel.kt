@@ -15,6 +15,8 @@ import es.tipolisto.breeds.data.providers.ArrayDataSourceProvider
 import es.tipolisto.breeds.data.repositories.RecordsRepository
 import es.tipolisto.breeds.utils.Util
 import kotlinx.coroutines.launch
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 
 class RecordsViewModel(private val recordDao:RecordDao):ViewModel() {
@@ -32,12 +34,13 @@ class RecordsViewModel(private val recordDao:RecordDao):ViewModel() {
                 var position=1;
                 var nameUser:String?=null
                 val iterator: Iterator<Int> = hashMapRecordList.keys.iterator()
+                val typeAnimalArray= listOf("cat","dog", "fish")
                 while (iterator.hasNext()) {
                     val points = iterator.next()
+                    val random= Random.nextInt(typeAnimalArray.size)
+                    val typeAnimal=typeAnimalArray[random]
                     nameUser = hashMapRecordList[points]
-                    val recordEntity= RecordEntity(null,nameUser!!,points, position,
-                        Util.getDate()
-                    )
+                    val recordEntity= RecordEntity(null,nameUser!!,points, position,typeAnimal,Util.getDate())
                     insertInDataBase(recordEntity)
                     position++;
                     Log.d("TAG", "Main activity dice: añadiendo "+recordEntity.toString())
@@ -53,12 +56,12 @@ class RecordsViewModel(private val recordDao:RecordDao):ViewModel() {
     }
 
 
-    fun insertNewRecord(name:String,score:Int){
+    fun insertNewRecord(name:String,score:Int, typeAnimal:String){
         //Obtenemos la posición del anterior record que hay por encima
         val position=getNewRecordPosition(score)
         //Cambiamos las posiciones de los records que están por debajo
         changeRecordsPosition(position)
-        insertInDataBase(RecordEntity(null,name,score,position, Util.getDate() ))
+        insertInDataBase(RecordEntity(null,name,score,position, typeAnimal,Util.getDate() ))
         //Log.d("TAG", "GameCatsScreen dice: Nuevo record de "+name)
         setRecord(false)
     }

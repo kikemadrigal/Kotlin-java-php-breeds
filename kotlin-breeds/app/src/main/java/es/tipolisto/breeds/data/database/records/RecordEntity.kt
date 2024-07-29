@@ -11,5 +11,6 @@ data class RecordEntity (
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "score") val score: Int,
     @ColumnInfo(name = "position") var position: Int,
+    @ColumnInfo(name = "typeAnimal") var typeAnimal: String,
     @ColumnInfo(name = "date") val date: String
 )

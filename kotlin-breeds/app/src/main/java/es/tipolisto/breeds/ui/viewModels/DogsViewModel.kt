@@ -9,7 +9,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
+import es.tipolisto.breeds.data.database.records.RecordDao
 import es.tipolisto.breeds.data.models.cat.Cat
+import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.providers.CatProvider
@@ -24,7 +26,7 @@ import java.util.Date
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-class DogsViewModel: ViewModel() {
+class DogsViewModel(private val recordDao: RecordDao): ViewModel() {
     var state by mutableStateOf(DogScreenState())
         private set
     var justOnce by mutableStateOf(false)
@@ -32,43 +34,30 @@ class DogsViewModel: ViewModel() {
     var gameOver by mutableStateOf(false)
         private set
     var clickPressed by mutableStateOf(false)
-    var clicksToExit=0
 
-
-    suspend fun loadAndInsertBuffer(){
-        stateIsLoading=true
-        DogRepository.loadDogAndInsertBuffer()
-        gameOver=false
-        stateIsLoading=false
-    }
 
     fun initGame() {
         gameOver=false
         state.lives=5
         state.score=0
     }
-    fun getAll():List<DogTL>{
-        return DogProvider.listDogs
+    fun getAllBreedsDogs():List<BreedDogTL>{
+        return DogProvider.listBreedDogs
     }
 
     fun get3RamdomDogs(){
         viewModelScope.launch {
             if (clickPressed) delay(2000)
-            val listRandomDogs= mutableListOf<DogTL?>(null, null, null)
-            listRandomDogs[0] = DogRepository.getRandomDogFromBuffer(listRandomDogs)
-            listRandomDogs[1] = DogRepository.getRandomDogFromBuffer(listRandomDogs)
-            listRandomDogs[2] = DogRepository.getRandomDogFromBuffer(listRandomDogs)
+            val listRandomDogs= DogRepository.getRandomListDogsFromBuffer()
             state=state.copy(
                 listRandomDogs=listRandomDogs
             )
             state.correctAnswer= Random.nextInt(0..2)
             clickPressed=false
-            /*Log.d("TAG", "DogViewModel: dog 1->${stateListRandomDogs[0]?.name}, ${stateListRandomDogs[0]?.reference_image_id}")
-            Log.d("TAG", "DogViewModel: dog 2->${stateListRandomDogs[1]?.name}, ${stateListRandomDogs[1]?.reference_image_id}")
-            Log.d("TAG", "DogViewModel: dog 3->${stateListRandomDogs[2]?.name}, ${stateListRandomDogs[2]?.reference_image_id}")
-*/
-
-            Log.d("TAG", "DogViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomDogs[state.correctAnswer]?.name}")
+            Log.d("TAG2", "DogViewModel: dog 0->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[0]?.breed_id)}")
+            Log.d("TAG2", "DogViewModel: dog 1->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[1]?.breed_id)}")
+            Log.d("TAG2", "DogViewModel: dog 2->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[2]?.breed_id)}")
+            Log.d("TAG2", "DogViewModel: El elegido es el ${state.correctAnswer}->${DogRepository.getBreedDogNameByBreedIdDog(state.listRandomDogs[state.correctAnswer]?.breed_id)}")
         }
     }
 
@@ -97,9 +86,12 @@ class DogsViewModel: ViewModel() {
 
     }
 
-    fun getDogByReferenceImageId(referenceImageId:String):DogTL?{
-        Log.d("TAG", "DogViewModel dice: Vamos a ver hay un gato con este breed id "+referenceImageId)
-        return DogRepository.getDogFromBreedIdInBuffer(referenceImageId)
+    /**
+     * Esta función es solo utilizada en el detailScreen
+     */
+    fun getBreedDogById(id:Int):BreedDogTL?{
+        Log.d("TAG", "DogViewModel dice: Vamos a ver hay un gato con este breed id "+id)
+        return DogRepository.getBreedDogByIdFromBuffer(id)
     }
 
 }

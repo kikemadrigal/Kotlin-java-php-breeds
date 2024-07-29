@@ -1,4 +1,4 @@
-package es.tipolisto.breeds.ui.views.screens.cats
+package es.tipolisto.breeds.ui.views.screens
 
 
 
@@ -58,8 +58,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.database.records.RecordEntity
+import es.tipolisto.breeds.data.models.cat.CatTL
+import es.tipolisto.breeds.data.models.dog.DogTL
+import es.tipolisto.breeds.data.models.fish.FishTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.repositories.CatRepository
+import es.tipolisto.breeds.data.repositories.DogRepository
+import es.tipolisto.breeds.data.repositories.FishRepository
 import es.tipolisto.breeds.data.repositories.RecordsRepository
 import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
@@ -67,6 +72,9 @@ import es.tipolisto.breeds.ui.components.onBackPressed
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
+import es.tipolisto.breeds.ui.viewModels.CompetitionViewModel
+import es.tipolisto.breeds.ui.viewModels.DogsViewModel
+import es.tipolisto.breeds.ui.viewModels.FishViewModel
 import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.AudioEffectsType
 import es.tipolisto.breeds.utils.Constants
@@ -76,19 +84,19 @@ import es.tipolisto.breeds.utils.Util
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, recordsViewModel: RecordsViewModel, mediaPlayerClient: MediaPlayerClient) {
+fun CompetitionScreen(navController: NavController, competitionViewModel:CompetitionViewModel, recordsViewModel: RecordsViewModel, mediaPlayerClient: MediaPlayerClient) {
     val context= LocalContext.current
     //if(stateNewRecord) checkNewRecord(context)
     //Esto es para que solo se ejecute 1 vez
     LaunchedEffect(key1 = true){
-        if (!catsViewModel.justOnce) {
-            catsViewModel.get3RamdomCats()
-            catsViewModel.justOnce=true
+        if (!competitionViewModel.justOnce) {
+            competitionViewModel.get3Ramdom()
+            competitionViewModel.justOnce=true
         }
     }
     //Conrol del botón atrás
     BackHandler{
-        catsViewModel.initGame()
+        competitionViewModel.initGame()
         onBackPressed(navController,context)
     }
 
@@ -99,7 +107,7 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.cat_game_playing_cat_breeds))
+                        Text(text = stringResource(id = R.string.Competition))
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary
@@ -107,29 +115,17 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
                     navigationIcon={
                         IconButton(
                             onClick = {
-                                catsViewModel.initGame()
+                                competitionViewModel.initGame()
                                 onBackPressed(navController,context)
                             }
                         ){
                             Icon(imageVector = Icons.Default.ArrowBack,contentDescription = "Back")
                         }
-                    },
-                    actions = {
-                        IconButton(onClick = {
-                            if(catsViewModel.getAllBreedsCats().isEmpty()){
-                                Toast.makeText(context,"Empty list",Toast.LENGTH_LONG).show()
-                            }else {
-                                navController.navigate(AppScreens.ListCatsScreen.route)
-                            }
-                        })
-                        {
-                            Image(painter = painterResource(id = R.drawable.cat), contentDescription = "Cat list")
-                        }
                     }
                 )
             }
         ){
-            GameCatScreenContent(it,catsViewModel,recordsViewModel, navController,mediaPlayerClient)
+            GameCompetitionScreenContent(it,competitionViewModel,recordsViewModel, navController,mediaPlayerClient)
         }
     }
 }
@@ -140,14 +136,14 @@ fun checkNewRecord(context:Context) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun GameCatScreen() {
+fun GameCompetitionScreen() {
     BreedsTheme (darkTheme = false){
         //GameCatScreen()
     }
 }
 
 @Composable
-fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewModel, recordsViewModel: RecordsViewModel, navController: NavController, mediaPlayerClient: MediaPlayerClient){
+fun GameCompetitionScreenContent(paddingsValues:PaddingValues, competitionViewModel: CompetitionViewModel, recordsViewModel: RecordsViewModel, navController: NavController, mediaPlayerClient: MediaPlayerClient){
     var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
     val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
 
@@ -158,13 +154,14 @@ fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewMod
             .padding(paddingsValues)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
+        //verticalArrangement = Arrangement.Center
     ){
-        if(catsViewModel.stateIsloading){
+        if(competitionViewModel.stateIsloading){
             MyCircularProgressIndicator(isDisplayed = true)
         }else
             MyCircularProgressIndicator(isDisplayed = false)
-        if(catsViewModel.gameOver) {
-            recordsViewModel.checkRecord(catsViewModel.state.score)
+        if(competitionViewModel.gameOver) {
+            recordsViewModel.checkRecord(competitionViewModel.state.score)
             //Obtenemos el record que hay encima
             if(stateNewRecord) {
                 MyAlertDialogNewRecord(
@@ -174,24 +171,24 @@ fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewMod
                     },
                     {
                         name->
-                        recordsViewModel.insertNewRecord(name,catsViewModel.state.score, "cat")
-                        catsViewModel.initGame()
+                        recordsViewModel.insertNewRecord(name,competitionViewModel.state.score, "mix")
+                        competitionViewModel.initGame()
                         navController.popBackStack()
                         navController.navigate(AppScreens.MenuScreen.route)
                     }
                 )
             }else{
-                catsViewModel.initGame()
+                competitionViewModel.initGame()
                 navController.popBackStack()
                 navController.navigate(AppScreens.MenuScreen.route)
             }
         }else{
             //catsViewModel.initGame()
-            Hud(catsViewModel)
+            Hud(competitionViewModel)
             //Pintamos la imagen del gato activo
-            DrawImageCat(catsViewModel)
+            DrawImageCat(competitionViewModel)
             //Pondreos el resultado a verdadero o falso
-            CatTest(catsViewModel, mediaPlayerClient)
+            CatTest(competitionViewModel, mediaPlayerClient)
         }
     }
 }
@@ -200,9 +197,9 @@ fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewMod
 
 
 @Composable
-fun Hud(catsViewModel: CatsViewModel){
-    val lives=catsViewModel.state.lives
-    val score=catsViewModel.state.score
+fun Hud(competitionViewModel: CompetitionViewModel){
+    val lives=competitionViewModel.state.lives
+    val score=competitionViewModel.state.score
     Row (
         modifier= Modifier
             .fillMaxWidth()
@@ -224,10 +221,16 @@ fun Hud(catsViewModel: CatsViewModel){
 
 
 @Composable
-fun DrawImageCat(catsViewModel: CatsViewModel){
+fun DrawImageCat(competitionViewModel: CompetitionViewModel){
     //Cuando se ontenga el gato activo se repintará la imagen
-    val cat= catsViewModel.getActiveCat()
-    if(cat?.path_image == null){
+    val animalType= competitionViewModel.getActive()
+    var path_image=""
+    when(animalType){
+        is CatTL->path_image=animalType.path_image
+        is DogTL->path_image=animalType.path_image
+        is FishTL ->path_image=animalType.path_image
+    }
+    if(path_image == null){
         Image(
             painter = painterResource(id = R.drawable.without_image),
             contentDescription = "Without image",
@@ -236,21 +239,23 @@ fun DrawImageCat(catsViewModel: CatsViewModel){
                 .height(250.dp)
         )
     }else{
+        competitionViewModel.stateIsloading=true
         AsyncImage(
-            model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+cat.path_image,
+            model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+path_image,
             contentDescription = "Select a breed",
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
             contentScale = ContentScale.Fit
         )
-        catsViewModel.stateIsloading=false
+        competitionViewModel.stateIsloading=false
     }
 }
 
 @Composable
-fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
+fun CatTest(competitionViewModel: CompetitionViewModel, mediaPlayerClient: MediaPlayerClient){
     val context=LocalContext.current
+    //val mediaPlayerClient by remember{ mutableStateOf(MediaPlayerClient(context))}
     DisposableEffect(Unit) {
         if(PreferenceManager.readPreferenceMusicOnOff(context)){
             mediaPlayerClient.playInGameMusic()
@@ -259,25 +264,32 @@ fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
             mediaPlayerClient.stopInGameMusic()
         }
     }
-    val correctAnswer=catsViewModel.state.correctAnswer
-    val listCatRandom=catsViewModel.state.listRandomCats
-    //Dibujamos el test
-    for (i in 0..<listCatRandom.size) {
+    val correctAnswer=competitionViewModel.state.correctAnswer
+    when(competitionViewModel.state.listSelected){
+         0->fillTestCat(competitionViewModel,correctAnswer,mediaPlayerClient)
+         1->fillTestDog(competitionViewModel,correctAnswer,mediaPlayerClient)
+         2->fillTestFish(competitionViewModel,correctAnswer,mediaPlayerClient)
+    }
+}
+
+@Composable
+fun fillTestCat(competitionViewModel:CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
+    for (i in 0..<competitionViewModel.state.listRandomCats.size) {
         Spacer(modifier = Modifier.size(10.dp))
         TextButton(
             modifier=Modifier.fillMaxWidth(),
             onClick = {
-                catsViewModel.checkCorrectAnswer(i)
+                competitionViewModel.checkCorrectAnswer(i)
                 if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
                 else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
-                catsViewModel.clickPressed=true
-                catsViewModel.get3RamdomCats()
+                competitionViewModel.clickPressed=true
+                competitionViewModel.get3Ramdom()
             }
         ){
-            val breedCat=catsViewModel.state.listRandomCats[i]?.breed_id
+            val breedCat=competitionViewModel.state.listRandomCats[i]?.breed_id
             val breedCatName=CatRepository.getBreedCatNameByIdCat(breedCat)
             var text=(i+1).toString()+")  "+ breedCatName+"."
-            if(catsViewModel.clickPressed){
+            if(competitionViewModel.clickPressed){
                 Text(
                     text = text,
                     maxLines = 1,
@@ -297,14 +309,98 @@ fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground ,
                     modifier=Modifier
-                            .fillMaxWidth()
+                        .fillMaxWidth()
                 )
             }
         }
     }//fin del for
 }
 
+@Composable
+fun fillTestDog(competitionViewModel: CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
+    for (i in 0..<competitionViewModel.state.listRandomDogs.size) {
+        Spacer(modifier = Modifier.size(10.dp))
+        TextButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                competitionViewModel.checkCorrectAnswer(i)
+                if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
+                else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
+                competitionViewModel.clickPressed=true
+                competitionViewModel.get3Ramdom()
+            }
+        ) {
+            val breedDog=competitionViewModel.state.listRandomDogs[i]?.breed_id
+            val breedDogName= DogRepository.getBreedDogByBreedIdFromBuffer(breedDog)
+            val text=(i+1).toString()+")  "+ breedDogName?.name_es+"."
+            if(competitionViewModel.clickPressed){
+                Text(
+                    text = text,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color=if(correctAnswer==i)Color.Black else Color.White,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier= Modifier
+                        .fillMaxWidth()
+                        .background(if (correctAnswer == i) Color.Green else Color.Red)
+                )
+            }else{
+                Text(
+                    text = text,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground ,
+                    modifier=Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+}
 
+@Composable
+fun fillTestFish(competitionViewModel: CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
+    for (i in 0..<competitionViewModel.state.listRandomFish.size) {
+        Spacer(modifier = Modifier.size(10.dp))
+        TextButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                competitionViewModel.checkCorrectAnswer(i)
+                if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
+                else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
+                competitionViewModel.clickPressed=true
+                competitionViewModel.get3Ramdom()
+            }
+        ) {
+            val specieId=competitionViewModel.state.listRandomFish[i]?.specie_id
+            val specie= FishRepository.getSpecieFishFromSpecieIdInBuffer(specieId)
+            val text=(i+1).toString()+")  "+ specie?.name_es+"."
+            if(competitionViewModel.clickPressed){
+                Text(
+                    text = text,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color=if(correctAnswer==i)Color.Black else Color.White,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier= Modifier
+                        .fillMaxWidth()
+                        .background(if (correctAnswer == i) Color.Green else Color.Red)
+                )
+            }else{
+                Text(
+                    text = text,
+                    //maxLines = 1,
+                    //overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground ,
+                    modifier=Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+}
 
 
 

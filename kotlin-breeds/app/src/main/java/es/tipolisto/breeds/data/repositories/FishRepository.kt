@@ -1,8 +1,14 @@
 package es.tipolisto.breeds.data.repositories
 
 import android.util.Log
+import android.widget.GridLayout.Spec
+import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.fish.Fish
+import es.tipolisto.breeds.data.models.fish.FishTL
+import es.tipolisto.breeds.data.models.fish.SpecieFishTL
 import es.tipolisto.breeds.data.network.RetrofitClient
+import es.tipolisto.breeds.data.providers.CatProvider
+import es.tipolisto.breeds.data.providers.DogProvider
 import es.tipolisto.breeds.data.providers.FishProvider
 import kotlin.random.Random
 
@@ -10,7 +16,7 @@ import kotlin.random.Random
 class FishRepository {
     companion object {
         suspend fun loadFishAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitFishService()
+            val service= RetrofitClient.getRetrofitService()
             try {
                 val response=service.getAllFish()
                 val listFish=response.body()
@@ -19,41 +25,59 @@ class FishRepository {
             }catch (ex: Exception){
                 Log.d("TAG", "Excepción en "+ex)
             }
-
+        }
+        suspend fun loadSpecieFishAndInsertBuffer() {
+            val service= RetrofitClient.getRetrofitService()
+            try {
+                val response=service.getAllSpecieFish()
+                val listSpecieFish=response.body()
+                if(listSpecieFish!=null)
+                    FishProvider.listSpecieFish=listSpecieFish
+            }catch (ex: Exception){
+                Log.d("TAG", "Excepción en "+ex)
+            }
         }
 
 
-        fun getRandomFishFromBuffer(restricted:List<Fish?>): Fish?{
-            var fish : Fish?=null
-            if(!FishProvider.listFish.isEmpty()){
-                val random = Random.nextInt(FishProvider.listFish.size)
-                //Log.d("TAG3", "FishRepository dice: el random es: "+random.toString())
-                fish= FishProvider.listFish[random]
-                //Log.d("TAG3", "FishRepository dice: el random es: "+fish.toString())
-                for(i in restricted){
-                    if(fish.name.equals(i?.name)) {
-                        getRandomFishFromBuffer(restricted)
-                    }
+        fun getRandomListFishFromBuffer(): MutableList<FishTL?>{
+            var listFish= mutableListOf<FishTL?>()
+            var fish : FishTL?=null
+            if(FishProvider.listFish.isNotEmpty()){
+                //Obtenemos los 3 números aleatorios diferentes
+                val setRandom= mutableSetOf<Int>()
+                //Como los et no pueden tener repetidos los metemos en un set
+                while (setRandom.size<3){
+                    setRandom.add(Random.nextInt(CatProvider.listCats.size))
+                }
+                for(i in setRandom){
+                    listFish.add(FishProvider.listFish[i])
                 }
             }else{
                 Log.d("TAG3", "la lista esta vacia")
             }
-            return fish
+            return listFish
         }
 
-        fun getFishFromSpecieIdInBuffer(id: Int): Fish?{
+        fun getSpecieFishFromSpecieIdInBuffer(sepecie_id: Int?): SpecieFishTL?{
             //Log.d("TAG", "FishRepository dice: pasa por getFishFromSpecieIdInBuffer con id: "+id)
-            var fish: Fish?=null
-            FishProvider.listFish.forEach{
-                if(it.id!=null){
-                    if(it.id==id) {
-                        //Log.d("TAG", "FishRepository dice: encontrado el pez: "+id)
-                        fish=it
-                    }
-                    //Log.d("TAG","FishRepository dice: Obtemido el pez: "+it.name)
+            var specieFish: SpecieFishTL?=null
+            FishProvider.listSpecieFish.forEach{
+                if(it.id==sepecie_id) {
+                    specieFish=it
                 }
             }
-            return fish
+            return specieFish
         }
     }//Final del cpompanion object
+
+    fun getSpecieNameByIdFish(id:Int):String{
+        var name=""
+        FishProvider.listSpecieFish.forEach {
+            val idFish = it.id;
+            if (idFish != null) {
+                if (idFish==id) name = it.name_es
+            }
+        }
+        return name
+    }
 }

@@ -25,6 +25,10 @@ class RecordsRepository() {
             return recordDao.getFollowingRecords(newPosition)
         }
 
+        fun getRecordMix(recordDao: RecordDao):Int{
+            return recordDao.getMaxRecordMix()
+        }
+
 
 
         fun insert(recordDao: RecordDao,recordEntities: RecordEntity){

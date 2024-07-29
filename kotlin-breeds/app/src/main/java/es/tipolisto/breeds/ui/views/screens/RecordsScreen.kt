@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -39,7 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,6 +54,8 @@ import es.tipolisto.breeds.data.database.AppDataBase
 import es.tipolisto.breeds.data.database.records.RecordEntity
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.repositories.RecordsRepository
+import es.tipolisto.breeds.ui.components.getRegisterAnnotated
+import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.MediaPlayerClient
@@ -81,22 +87,41 @@ fun RecordsScreen(recordsViewModel: RecordsViewModel,navController:NavController
                 )
             }
         ) {
-            val context = LocalContext.current
+            //val context = LocalContext.current
             val listRecords: List<RecordEntity> = recordsViewModel.getFirst20()
             if (listRecords.isEmpty())
                 Text(text = stringResource(id = R.string.empty_list))
             else{
+                val uriHandler= LocalUriHandler.current
+                val registerAnnotated = getRegisterAnnotated()
                 Column(
                     modifier= Modifier
                         .fillMaxSize()
                         .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
+                    Spacer(modifier = Modifier.size(10.dp))
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            navController.navigate(AppScreens.LoginScreen.route)
+                        },
                         ) {
-                        Text(text = stringResource(R.string.upload_to_internet))
+                        Column{
+                            Text(text = stringResource(R.string.upload_to_internet))
+                            Spacer(modifier = Modifier.size(2.dp))
+                            Text(text = stringResource(R.string.you_need_to_register))
+                        }
                     }
+                    Spacer(modifier = Modifier.size(10.dp))
+                    ClickableText(
+                        text = registerAnnotated,
+                        onClick = { offset ->
+                            val uri= registerAnnotated.getStringAnnotations(tag = "register", start = offset, end = offset).firstOrNull()?.item
+                            if(uri!=null)
+                                uriHandler.openUri(uri)
+                            Log.d("TAG","Click en web")
+                        }
+                    )
                     Spacer(modifier = Modifier.size(10.dp))
                     LazyColumn{
                         items(listRecords){
@@ -127,6 +152,7 @@ fun listIntemRow(recordEntity: RecordEntity, navController: NavController){
         Text(text = recordEntity.position.toString(),modifier=Modifier.weight(0.5f),style = MaterialTheme.typography.bodyMedium)
         Text(text = recordEntity.score.toString(),modifier=Modifier.weight(1f),style = MaterialTheme.typography.bodyMedium )
         Text(text = recordEntity.name,modifier=Modifier.weight(1f),style = MaterialTheme.typography.bodyMedium)
+        Text(text = recordEntity.typeAnimal,modifier=Modifier.weight(1f),style = MaterialTheme.typography.bodyMedium)
         Text(text = trimString(recordEntity.date),modifier=Modifier.weight(1f),style = MaterialTheme.typography.bodySmall)
     }
     Divider(color = MaterialTheme.colorScheme.secondary, thickness = 1.dp)

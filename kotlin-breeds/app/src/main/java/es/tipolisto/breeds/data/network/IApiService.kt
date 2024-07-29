@@ -7,9 +7,18 @@ import es.tipolisto.breeds.data.models.cat.ImageCat
 import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.dog.ImageDog
+import es.tipolisto.breeds.data.models.fish.Fish
+import es.tipolisto.breeds.data.models.fish.FishTL
+import es.tipolisto.breeds.data.models.fish.SpecieFishTL
+import es.tipolisto.breeds.utils.Constants
+import retrofit2.Call
 
 import retrofit2.Response
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -120,8 +129,6 @@ interface IApiService {
         }
     ]
     */
-
-
     @GET("images/{reference_image_id}")
     suspend fun getImageCat(@Path ("reference_image_id") reference_image_id:String): Response<ImageCat>
 
@@ -131,13 +138,46 @@ interface IApiService {
 
 
     @GET("breedDogs.php")
-    suspend fun getListBreedDogs():Response<List<BreedDogTL>>
+    suspend fun getAllBreedDogs(): Response<List<BreedDogTL>>
 
     @GET("dogs.php")
     suspend fun getListDogs():Response<List<DogTL>>
+
 
     //Devuelve una imagen de un perro a partir del breed_id
     //https://api.thedogapi.com/v1/images/search?bree_id=HJ7Pzg5EQ
     @GET("images/search")
     suspend fun getDataDogBreedById(@Query("bree_id") reference_image_id:String):Response<List<ImageDog>>
+
+
+
+
+
+
+    @GET("specieFish.php")
+    suspend fun getAllSpecieFish(): Response<List<SpecieFishTL>>
+
+    @GET("fish.php")
+    //@Headers("X-RapidAPI-Key: ${Constants.KEY_API_FISH}" ,"X-RapidAPI-Host: fish-species.p.rapidapi.com")
+    suspend fun getAllFish(): Response<List<FishTL>>
+
+
+
+    @POST("saveScore.php")
+    @FormUrlEncoded
+    suspend fun saveScore(
+        @Field("name") name: String,
+        @Field("password") password: String,
+        @Field("score") score: Int
+    ): Response<String>
+
+    @POST("saveBeauty.php")
+    @FormUrlEncoded
+    suspend fun saveBeauty(
+        @Field("name") name: String,
+        @Field("password") password: String,
+        @Field("nameBeauty") nameBeauty: String,
+        @Field("description") description: String,
+        @Field("image") image: String
+    ): Response<String>
 }

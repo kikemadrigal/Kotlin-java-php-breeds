@@ -26,6 +26,7 @@ import es.tipolisto.breeds.data.providers.ArrayDataSourceProvider
 import es.tipolisto.breeds.ui.navigation.AppNavigation
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
+import es.tipolisto.breeds.ui.viewModels.CompetitionViewModel
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
@@ -48,9 +49,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val mediaPlayerClient=MediaPlayerClient( applicationContext )
 
-        val fishViewModel: FishViewModel by viewModels()
-        val dogsViewModel: DogsViewModel by viewModels()
-        val loginViewModel:LoginViewModel by viewModels()
+        //val fishViewModel: FishViewModel by viewModels()
+        //val dogsViewModel: DogsViewModel by viewModels()
+        //val loginViewModel:LoginViewModel by viewModels()
         setContent {
             val context=LocalContext.current
             var isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
@@ -66,6 +67,10 @@ class MainActivity : ComponentActivity() {
                     //getRecords(recordsViewModel, recordsDao)
                     recordsViewModel.initializeRecords()
                     val catsViewModel= CatsViewModel(recordsDao)
+                    val dogsViewModel=DogsViewModel(recordsDao)
+                    val fishViewModel=FishViewModel(recordsDao)
+                    val loginViewModel=LoginViewModel(recordsDao)
+                    val competitionViewModel= CompetitionViewModel(recordsDao)
                     //2.creamos la base de datos e inicilizamos las clases que necesitas los dao
                     val favoritesDao=AppDataBaseClient.getFavoritesDao(applicationContext)
                     val favoritesViewModel=FavoritesViewModel(favoritesDao)
@@ -76,6 +81,7 @@ class MainActivity : ComponentActivity() {
                         catsViewModel,
                         dogsViewModel,
                         fishViewModel,
+                        competitionViewModel,
                         favoritesViewModel,
                         recordsViewModel,
                         loginViewModel,

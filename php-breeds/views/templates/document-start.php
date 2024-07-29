@@ -4,11 +4,11 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="application-name" content="MSX Quiz" />
+    <meta name="application-name" content="Breeds" />
     <meta name="author" content="tipolisto.es">
-    <meta name="description" content="MSX Quiz">
+    <meta name="description" content="Breeds">
     <meta name="generator" content="Bootstrap" />
-	<meta name="keywords" content="MSX Quiz" />
+	<meta name="keywords" content="Breeds" />
     <link rel="icon" type="image/png" href="<?php echo PATHIMAGES ?>icono.png" />
 	<title>Breeds and species</title>
     <!-- Bootstrap CSS -->

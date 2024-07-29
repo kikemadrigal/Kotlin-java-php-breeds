@@ -53,6 +53,7 @@ import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
+import es.tipolisto.breeds.utils.Constants
 import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.suspendCoroutine
 
@@ -65,8 +66,8 @@ fun DetailFishScreen(
     favoritesViewModel: FavoritesViewModel
 ){
     val context= LocalContext.current
-     val fish = fishViewModel.getFishByIdFish(id)
-    favoritesViewModel.checkIsInFavorites(fish?.id.toString())
+     val specieFish = fishViewModel.getSpecieFishByIdFish(id)
+    favoritesViewModel.checkIsInFavorites(specieFish?.id.toString())
     Log.d("TAG","DeltailFishScreen dice: el pez es favorito? "+favoritesViewModel.isFavorite.value)
     val isFavorite: Boolean by favoritesViewModel.isFavorite.observeAsState(initial = false)
     val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
@@ -90,14 +91,14 @@ fun DetailFishScreen(
                         IconButton(
                             onClick = {
                                 if (isFavorite){
-                                    val list=favoritesViewModel.getFavoritesByIdAnimal(fish?.id.toString())
+                                    val list=favoritesViewModel.getFavoritesByIdAnimal(specieFish?.id.toString())
                                     if(list!=null)
                                         favoritesViewModel.delete(list[0])
                                     favoritesViewModel.setFavorite(false)
                                     //Si no está en la lista de favoritos
                                 }else{
-                                    favoritesViewModel.createFavorite(fish)
-                                    Toast.makeText(context, "Added cat to favorites", Toast.LENGTH_LONG)
+                                    favoritesViewModel.createFavorite(specieFish)
+                                    Toast.makeText(context, "Added specie fish to favorites", Toast.LENGTH_LONG)
                                         .show()
                                     favoritesViewModel.setFavorite(true)
                                 }
@@ -119,8 +120,8 @@ fun DetailFishScreen(
                 )
             }
         ) {
-            val fish = fishViewModel.getFishByIdFish(id)
-            val url = fish?.img_src_set
+            val specieFish = fishViewModel.getSpecieFishByIdFish(id)
+            val url = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+specieFish?.path_image
             val model by remember { mutableStateOf(url) }
             Card(
                 modifier = Modifier
@@ -142,11 +143,14 @@ fun DetailFishScreen(
                             .size(400.dp, 300.dp),
                         contentScale = ContentScale.Fit
                     )
-                    if (fish != null) {
-                        Text(text = fish.name, textAlign = TextAlign.Center)
-                        Text(text = fish.urlWiki + "", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = fish.meta + "", style = MaterialTheme.typography.bodyMedium)
-                    }
+
+                    Text(text = specieFish?.name_es+"", textAlign = TextAlign.Center)
+                    Text(text = specieFish?.description + "", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = specieFish?.morphology + "", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = specieFish?.habitat + "", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = specieFish?.feeding + "", style = MaterialTheme.typography.bodyMedium)
+                //Text(text = fish.meta + "", style = MaterialTheme.typography.bodyMedium)
+
                 }//Final del column
             }//Final del card
         }//Fin scafold

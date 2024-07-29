@@ -48,6 +48,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import es.tipolisto.breeds.R
+import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.fish.Fish
@@ -58,6 +59,7 @@ import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
+import es.tipolisto.breeds.utils.Constants
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +92,7 @@ fun ListDogScreen(navController:NavController, dogsViewModel: DogsViewModel) {
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val datos=dogsViewModel.getAll()
+                val datos=dogsViewModel.getAllBreedsDogs()
                 items(datos) { item ->
                     ListIntemRow(item, navController)
                 }
@@ -109,13 +111,13 @@ fun ListFishScreenPreview() {
 
 
 @Composable
-fun ListIntemRow(dog: DogTL, navController: NavController){
+fun ListIntemRow(breed: BreedDogTL, navController: NavController){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
             .clickable {
-                navController.navigate(AppScreens.DetailDogScreen.route + "/${dog.breed_id}")
+                navController.navigate(AppScreens.DetailDogScreen.route + "/${breed.id}")
             },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -126,17 +128,19 @@ fun ListIntemRow(dog: DogTL, navController: NavController){
             modifier=Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            DogImage(dog)
-            Text(text = dog.name, style = MaterialTheme.typography.headlineLarge)
-            Text(text = getDogContent(dog), style = MaterialTheme.typography.bodyLarge)
+            DogImage(breed)
+            var text=breed.name_es
+            if(text.length>30)text=text.substring(0,30)+"..."
+            Text(text = text, style = MaterialTheme.typography.headlineLarge)
+            Text(text = getDogContent(breed), style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
 
 
 @Composable
-fun DogImage(dog: DogTL){
-    val url=dog.path_image
+fun DogImage(breed: BreedDogTL){
+    val url= Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breed.path_image
     if(url!="Not image"){
         val model by remember { mutableStateOf(url) }
         AsyncImage(
@@ -151,10 +155,11 @@ fun DogImage(dog: DogTL){
 }
 
 @Composable
-fun getDogContent(dog:DogTL):String{
+fun getDogContent(breed:BreedDogTL):String{
+    var breed_group_es=breed.breed_group_es
+    if(breed_group_es.length>30)breed_group_es=breed_group_es.substring(0,30)
     return stringResource(id = R.string.dog_bred_for)+
-            ": "+ dog.name + "\n"+
+            ": "+ breed.breed_group_es + "\n"+
             stringResource(id = R.string.dog_breed_group)+
-            ": "+dog.description_es
-
+            ": "+breed_group_es
 }

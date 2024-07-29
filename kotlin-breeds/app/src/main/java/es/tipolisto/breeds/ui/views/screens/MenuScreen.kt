@@ -85,6 +85,11 @@ val itemsBottomMenu = listOf(
         title="Fish",
         image=R.drawable.fish_menu,
         navigation = AppScreens.GameFishScreen.route
+    ),
+    BottomMenu(
+        title="Competition",
+        image=R.drawable.competition,
+        navigation = AppScreens.CompetitionScreen.route
     )
 )
 val itemsBottomBar= listOf(

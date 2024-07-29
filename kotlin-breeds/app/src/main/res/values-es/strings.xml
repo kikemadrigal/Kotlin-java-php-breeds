@@ -55,6 +55,10 @@
     <string name="cats">Gatos</string>
     <string name="dogs">Perros</string>
     <string name="fish">Peces</string>
-    <string name="upload_to_internet">Subir puntos a internet</string>
+    <string name="upload_to_internet">Subir puntos a internet-solo mix</string>
+    <string name="dog_description">Descripción</string>
+    <string name="dog_morphology">Morfología</string>
+    <string name="Competition">Competición</string>
+    <string name="you_need_to_register">Necesitas estar registrado</string>
 
 </resources>

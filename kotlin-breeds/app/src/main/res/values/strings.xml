@@ -20,6 +20,7 @@
     <string name="cat_short_legs">short_legs</string>
 
 
+
     <string name="dog_bred_for">bred_for</string>
     <string name="dog_breed_group">breed_group</string>
     <string name="dog_life_span">life_span</string>
@@ -53,5 +54,9 @@
     <string name="cats">Cats</string>
     <string name="dogs">Dogs</string>
     <string name="fish">Fish</string>
-    <string name="upload_to_internet">Upload points to the internet</string>
+    <string name="upload_to_internet">Upload points to the internet-only mix</string>
+    <string name="dog_description">Description</string>
+    <string name="dog_morphology">Morphology</string>
+    <string name="Competition">Competition</string>
+    <string name="you_need_to_register">You need to register</string>
 </resources>

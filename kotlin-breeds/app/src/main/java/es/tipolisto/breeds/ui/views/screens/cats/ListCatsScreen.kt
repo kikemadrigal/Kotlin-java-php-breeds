@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
+import es.tipolisto.breeds.data.models.cat.BreedCatTL
 import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
@@ -53,6 +54,7 @@ import es.tipolisto.breeds.data.providers.CatProvider
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
+import es.tipolisto.breeds.utils.Constants
 
 
 @Composable
@@ -84,7 +86,7 @@ fun ListCatsScreen(navController:NavController,catsViewModel:CatsViewModel) {
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val datos = catsViewModel.getAll()
+                val datos = catsViewModel.getAllBreedsCats()
                 items(datos) { item ->
                     ListIntemRow(item, navController)
                 }
@@ -103,13 +105,13 @@ fun ListCatsScreenPreview() {
 
 
 @Composable
-fun ListIntemRow(cat: CatTL, navController: NavController){
+fun ListIntemRow(breedCat: BreedCatTL, navController: NavController){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
             .clickable{
-                navController.navigate(AppScreens.DetailCatScreen.route + "/${cat.id}")
+                navController.navigate(AppScreens.DetailCatScreen.route + "/${breedCat.id}")
             },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -119,17 +121,21 @@ fun ListIntemRow(cat: CatTL, navController: NavController){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CatImage(cat = cat)
-            Text(text = cat.name, style = MaterialTheme.typography.headlineLarge)
-            Text(text = cat.description, style = MaterialTheme.typography.bodyLarge)
+            var description_es=breedCat.description_es;
+            if(description_es.length>100){
+                description_es=description_es.substring(0, 100) + "..."
+            }
+            CatImage(breedCat = breedCat)
+            Text(text = breedCat.name_es, style = MaterialTheme.typography.headlineLarge)
+            Text(text = description_es, style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
 
 @Composable
-fun CatImage(cat: CatTL){
+fun CatImage(breedCat: BreedCatTL){
     //Image(painter= rememberAsyncImagePainter(request="https://loremflickr.com/100/100"), contentDescription = null )
-    var url="https://breeds.tipolisto.es/"+cat.path_image
+    var url=Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat.path_image
     var model by remember { mutableStateOf(url) }
     AsyncImage(
         model = model,

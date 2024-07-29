@@ -16,15 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,8 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +45,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,21 +53,22 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
-import es.tipolisto.breeds.data.repositories.CatRepository
+import es.tipolisto.breeds.data.repositories.FishRepository
+import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
 import es.tipolisto.breeds.ui.components.onBackPressed
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
-import es.tipolisto.breeds.ui.views.screens.cats.CatTest
-import es.tipolisto.breeds.ui.views.screens.cats.DrawImageCat
+import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.AudioEffectsType
+import es.tipolisto.breeds.utils.Constants
 import es.tipolisto.breeds.utils.MediaPlayerClient
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, mediaPlayerClient: MediaPlayerClient){
+fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, recordsViewModel: RecordsViewModel, mediaPlayerClient: MediaPlayerClient){
     val context=LocalContext.current
     var isDarkMode by remember { mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context)) }
 
@@ -80,7 +82,6 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, m
     }
     LaunchedEffect(key1 = true){
         if(!fishViewModel.justOnce){
-            fishViewModel.loadAndInsertBuffer()
             fishViewModel.get3RamdomFish()
             fishViewModel.justOnce=true
         }
@@ -114,7 +115,7 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, m
                     },
                     actions = {
                         IconButton(onClick = {
-                            if(fishViewModel.getAll().isEmpty()){
+                            if(fishViewModel.getAllSpeciesFish().isEmpty()){
                                 Toast.makeText(context,"Empty list", Toast.LENGTH_LONG).show()
                             }else {
                                 navController.navigate(AppScreens.ListFishScreen.route)
@@ -129,7 +130,7 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, m
                 )
             }
         ) {
-            GameFishScreenContent(it, fishViewModel, navController, mediaPlayerClient)
+            GameFishScreenContent(it, fishViewModel, recordsViewModel,navController, mediaPlayerClient)
         }
     }
 }
@@ -146,11 +147,16 @@ fun GameFishScreenPreview() {
 
 
 @Composable
-fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewModel, navController: NavController, mediaPlayerClient: MediaPlayerClient){
+fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewModel, recordsViewModel: RecordsViewModel,navController: NavController, mediaPlayerClient: MediaPlayerClient){
+    var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
+    val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
+
     Column (
         modifier = Modifier
             .fillMaxHeight()
-            .padding(paddingsValues),
+            .padding(paddingsValues)
+            .verticalScroll(rememberScrollState()),
+
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         if(fishViewModel.stateIsLoading){
@@ -158,11 +164,26 @@ fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewM
         }else
             MyCircularProgressIndicator(isDisplayed = false)
         if(fishViewModel.gameOver) {
-            fishViewModel.initGame()
-            navController.popBackStack()
-            navController.navigate(AppScreens.MenuScreen.route)
+            recordsViewModel.checkRecord(fishViewModel.state.score)
+            if(stateNewRecord) {
+                MyAlertDialogNewRecord(
+                    stateNewRecord,
+                    {
+                        showNewRecordDialog = false
+                    },
+                    { name->
+                        recordsViewModel.insertNewRecord(name,fishViewModel.state.score, "fish")
+                        fishViewModel.initGame()
+                        navController.popBackStack()
+                        navController.navigate(AppScreens.MenuScreen.route)
+                    }
+                )
+            }else {
+                fishViewModel.initGame()
+                navController.popBackStack()
+                navController.navigate(AppScreens.MenuScreen.route)
+            }
         }else {
-            //catsViewModel.initGame()
             FishHud(fishViewModel)
             //Pintamos la imagen del gato activo
             DrawImageFish(fishViewModel)
@@ -196,19 +217,19 @@ fun FishHud(fishViewModel: FishViewModel){
 @Composable
 fun DrawImageFish(fishViewModel: FishViewModel){
     val fish= fishViewModel.getActiveFish()
-    if(fish?.img_src_set=="Not image"||fish==null){
-        Image(
+    if(fish==null){
+       Image(
             painter = painterResource(id = R.drawable.without_image),
             contentDescription = "Splash breeds",
             Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+                .height(250.dp)
         )
-        fishViewModel.get3RamdomFish()
+
     }else{
         AsyncImage(
-            model = fish.img_src_set,
-            contentDescription = "Select a breed",
+            model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+fish.path_image,
+            contentDescription = "Select a specie",
             modifier = Modifier
                 .size(300.dp, 300.dp)
                 .padding(top = 20.dp),
@@ -221,7 +242,6 @@ fun DrawImageFish(fishViewModel: FishViewModel){
 fun FishTest(fishViewModel: FishViewModel, mediaPlayerClient:MediaPlayerClient){
     val listFishRandom=fishViewModel.state.listRandomFish
     val correctAnswer=fishViewModel.state.correctAnswer
-
     //Dibujamos el test
     for (i in 0..<listFishRandom.size) {
         Spacer(modifier = Modifier.size(10.dp))
@@ -235,14 +255,17 @@ fun FishTest(fishViewModel: FishViewModel, mediaPlayerClient:MediaPlayerClient){
                 fishViewModel.get3RamdomFish()
             }
         ) {
-            val text = (i+1).toString()+")  "+fishViewModel.state.listRandomFish.get(i)?.name
+            val specieId=fishViewModel.state.listRandomFish[i]?.specie_id
+            val specie= FishRepository.getSpecieFishFromSpecieIdInBuffer(specieId)
+            val text=(i+1).toString()+")  "+ specie?.name_es+"."
+            //if (text.length > 100) text=text.substring(0, 30) + "..."
             if(fishViewModel.clickPressed){
                 Text(
                     text = text,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     color=if(correctAnswer==i)Color.Black else Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     modifier= Modifier
                         .fillMaxWidth()
                         .background(if (correctAnswer == i) Color.Green else Color.Red)
@@ -250,9 +273,9 @@ fun FishTest(fishViewModel: FishViewModel, mediaPlayerClient:MediaPlayerClient){
             }else{
                 Text(
                     text = text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.headlineMedium,
+                    //maxLines = 1,
+                    //overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground ,
                     modifier=Modifier
                         .fillMaxWidth()

@@ -15,12 +15,14 @@ import androidx.navigation.navArgument
 import es.tipolisto.breeds.data.database.AppDataBase
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
+import es.tipolisto.breeds.ui.viewModels.CompetitionViewModel
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
 import es.tipolisto.breeds.ui.viewModels.LoginViewModel
 import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.ui.views.screens.BeautiesScreen
+import es.tipolisto.breeds.ui.views.screens.CompetitionScreen
 import es.tipolisto.breeds.ui.views.screens.cats.DetailCatScreen
 import es.tipolisto.breeds.ui.views.screens.cats.GameCatScreen
 import es.tipolisto.breeds.ui.views.screens.cats.ListCatsScreen
@@ -43,6 +45,7 @@ fun AppNavigation(
     catsViewModel:CatsViewModel,
     dogsViewModel: DogsViewModel,
     fishViewModel: FishViewModel,
+    competitionViewModel: CompetitionViewModel,
     favoritesViewModel: FavoritesViewModel,
     recordsViewModel:RecordsViewModel,
     loginViewModel: LoginViewModel,
@@ -74,6 +77,14 @@ fun AppNavigation(
         composable(AppScreens.LoginScreen.route){
             LoginScreen(loginViewModel,navController)
         }
+        composable(AppScreens.CompetitionScreen.route){
+            CompetitionScreen(
+                navController = navController,
+                competitionViewModel = competitionViewModel,
+                recordsViewModel = recordsViewModel,
+                mediaPlayerClient = mediaPlayerClient
+            )
+        }
 
         /*
          * Favorites
@@ -93,12 +104,12 @@ fun AppNavigation(
             ListCatsScreen(navController,catsViewModel)
         }
         composable(
-            route=AppScreens.DetailCatScreen.route+"/{reference_image_id}",
+            route=AppScreens.DetailCatScreen.route+"/{id}",
             arguments = listOf(
-                navArgument(name="idCat"){type= NavType.IntType})
+                navArgument(name="id"){type= NavType.IntType})
         )
         {
-            val idCat:Int?=it.arguments?.getInt("idCat")
+            val idCat:Int?=it.arguments?.getInt("id")
             requireNotNull(idCat, { "No puede ser nulo" })
             DetailCatScreen(navController,catsViewModel,idCat,favoritesViewModel)
         }
@@ -109,20 +120,20 @@ fun AppNavigation(
          * DOGS
          */
         composable(AppScreens.GameDogScreen.route){
-            GameDogScreen(navController,dogsViewModel, mediaPlayerClient)
+            GameDogScreen(navController,dogsViewModel,recordsViewModel, mediaPlayerClient)
         }
         composable(AppScreens.ListDogsScreen.route){
             ListDogScreen(navController,dogsViewModel)
         }
         composable(
-            route=AppScreens.DetailDogScreen.route+"/{reference_image_id}",
+            route=AppScreens.DetailDogScreen.route+"/{id}",
             arguments = listOf(
-                navArgument(name="reference_image_id"){type= NavType.StringType})
+                navArgument(name="id"){type= NavType.IntType})
         )
         {
-            val referenceImageId:String?=it.arguments?.getString("reference_image_id")
-            requireNotNull(referenceImageId, { "No puede ser nulo" })
-            DetailDogScreen(navController, dogsViewModel, referenceImageId,favoritesViewModel)
+            val dogId:Int?=it.arguments?.getInt("id")
+            requireNotNull(dogId, { "No puede ser nulo" })
+            DetailDogScreen(navController, dogsViewModel, dogId,favoritesViewModel)
         }
 
 
@@ -132,7 +143,7 @@ fun AppNavigation(
          * Fish
          */
         composable(AppScreens.GameFishScreen.route){
-           GameFishScreen(navController,fishViewModel, mediaPlayerClient)
+           GameFishScreen(navController,fishViewModel, recordsViewModel,mediaPlayerClient)
         }
         composable(AppScreens.ListFishScreen.route){
             ListFishScreen(navController, fishViewModel)

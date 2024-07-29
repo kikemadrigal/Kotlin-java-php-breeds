@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.invalidateGroupsWithKey
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,20 +37,26 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(navController:NavController){
-    var status=""
+    var status by remember{mutableStateOf("")}
 
     //MyCircularProgressIndicator(isDisplayed = true)
     LaunchedEffect(key1 = true ){
-        //delay(1000)
 
-        CatRepository.loadCatsAndInsertBuffer()
+        status="Chequenado conexión a internet y permisos"
+
         status="Loading cats from internet"
+        CatRepository.loadCatsAndInsertBuffer()
+        status="Loading breeds cats from internet"
         CatRepository.loadBreedCatsAndInsertBuffer()
-        status="Loading brred cats from internet"
+        status="Loading dogs from internet"
         DogRepository.loadDogAndInsertBuffer()
-        status="Loading dogs"
-        //FishRepository.loadFishAndInsertBuffer()
+        status="Loading breeds dogs from internet"
+        DogRepository.loadBreedDogsAndInsertBuffer()
+        status="Loading fish"
+        FishRepository.loadFishAndInsertBuffer()
         status="Loading species"
+        FishRepository.loadSpecieFishAndInsertBuffer()
+
         //Antes de navegar limpiamos la pila de ventanas para que no vuelva a salir el splash
         navController.popBackStack()
         navController.navigate(AppScreens.MenuScreen.route)
@@ -56,19 +66,19 @@ fun SplashScreen(navController:NavController){
 @Composable
 fun Splash(status:String){
     Column (modifier = Modifier.padding(0.dp)){
-        Image(
-            painter = painterResource(id = R.drawable.splash_screen),
-            contentDescription = "Splash breeds",
-            Modifier.fillMaxWidth().height(500.dp),
-            contentScale = ContentScale.FillBounds
-        )
         Text(
             text = status,
             Modifier.background(color = Color.Blue)
-                .fillMaxSize(),
+                .fillMaxWidth(),
             color = Color.White,
             fontSize = 24.sp,
             textAlign = TextAlign.Center
+        )
+        Image(
+            painter = painterResource(id = R.drawable.splash_screen),
+            contentDescription = "Splash breeds",
+            Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
         )
     }
 }

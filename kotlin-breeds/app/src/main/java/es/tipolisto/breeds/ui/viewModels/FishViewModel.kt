@@ -2,6 +2,7 @@ package es.tipolisto.breeds.ui.viewModels
 
 import android.content.Context
 import android.util.Log
+import android.widget.GridLayout.Spec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -10,8 +11,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
+import es.tipolisto.breeds.data.database.records.RecordDao
 import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.fish.Fish
+import es.tipolisto.breeds.data.models.fish.FishTL
+import es.tipolisto.breeds.data.models.fish.SpecieFishTL
 import es.tipolisto.breeds.data.providers.CatProvider
 import es.tipolisto.breeds.data.providers.FishProvider
 import es.tipolisto.breeds.data.repositories.CatRepository
@@ -24,7 +28,7 @@ import java.util.Date
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-class FishViewModel: ViewModel() {
+class FishViewModel(private val recordDao: RecordDao): ViewModel() {
     var state by mutableStateOf(FishScreenState())
         private set
     var justOnce by mutableStateOf(false)
@@ -33,42 +37,32 @@ class FishViewModel: ViewModel() {
     var gameOver by mutableStateOf(false)
         private set
     var clickPressed by mutableStateOf(false)
-    var clicksToExit=0
 
-    suspend fun loadAndInsertBuffer(){
-        stateIsLoading=true
-        FishRepository.loadFishAndInsertBuffer()
-        gameOver=false
-        stateIsLoading=false
-    }
     fun initGame() {
         gameOver=false
         state.lives=5
         state.score=0
     }
-    fun getAll():List<Fish>{
-        return FishProvider.listFish
+    fun getAllSpeciesFish():List<SpecieFishTL>{
+        return FishProvider.listSpecieFish
     }
     fun get3RamdomFish(){
         viewModelScope.launch {
             if (clickPressed) delay(2000)
-            val listRandomFish= mutableListOf<Fish?>(null, null, null)
-            listRandomFish[0] = FishRepository.getRandomFishFromBuffer(listRandomFish)
-            listRandomFish[1] = FishRepository.getRandomFishFromBuffer(listRandomFish)
-            listRandomFish[2] = FishRepository.getRandomFishFromBuffer(listRandomFish)
+            val listRandomFish= FishRepository.getRandomListFishFromBuffer()
             state=state.copy(
                 listRandomFish=listRandomFish
             )
             state.correctAnswer= Random.nextInt(0..2)
             clickPressed=false
-            //Log.d("TAG", "FishViewModel: fish 1->${stateListRandomFish[0]?.name}, ${stateListRandomFish[0]?.id}")
-            //Log.d("TAG", "FishViewModel: fish 2->${stateListRandomFish[1]?.name}, ${stateListRandomFish[1]?.id}")
-            //Log.d("TAG", "FishViewModel: fish 3->${stateListRandomFish[2]?.name}, ${stateListRandomFish[2]?.id}")
-            Log.d("TAG", "FishViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomFish[state.correctAnswer]?.name}, ${state.listRandomFish[state.correctAnswer]?.id}")
+            Log.d("TAG2", "FishViewModel: fish 1->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[0]?.specie_id)?.name_es}")
+            Log.d("TAG2", "FishViewModel: fish 2->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[1]?.specie_id)?.name_es}")
+            Log.d("TAG2", "FishViewModel: fish 3->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[2]?.specie_id)?.name_es}")
+            Log.d("TAG2", "FishViewModel: El elegido es el ${state.correctAnswer}->${FishRepository.getSpecieFishFromSpecieIdInBuffer(state.listRandomFish[state.correctAnswer]?.specie_id)?.name_es}")
         }
     }
 
-    fun getActiveFish(): Fish?{
+    fun getActiveFish(): FishTL?{
         return state.listRandomFish[state.correctAnswer]
     }
 
@@ -93,9 +87,9 @@ class FishViewModel: ViewModel() {
 
     }
 
-    fun getFishByIdFish(id:Int): Fish?{
+    fun getSpecieFishByIdFish(id:Int): SpecieFishTL?{
         Log.d("TAG", "FishViewModel dice: Vamos a ver hay un gato con este breed id "+id)
-        return FishRepository.getFishFromSpecieIdInBuffer(id)
+        return FishRepository.getSpecieFishFromSpecieIdInBuffer(id)
     }
 
 

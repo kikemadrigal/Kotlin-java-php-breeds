@@ -9,13 +9,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import es.tipolisto.breeds.data.database.favorites.FavoritesDao
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
+import es.tipolisto.breeds.data.models.cat.BreedCatTL
 import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.cat.CatTL
+import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.fish.Fish
+import es.tipolisto.breeds.data.models.fish.FishTL
+import es.tipolisto.breeds.data.models.fish.SpecieFishTL
 import es.tipolisto.breeds.data.repositories.FavoritesRepository
 import es.tipolisto.breeds.ui.states.FavoritesScreenState
+import es.tipolisto.breeds.utils.Constants
 import java.util.Date
 
 
@@ -56,21 +61,21 @@ class FavoritesViewModel(private val favoritesDao: FavoritesDao): ViewModel() {
     }
 
 
-    fun createFavorite(cat: CatTL){
+    fun createFavorite(breedCat: BreedCatTL){
         //Creamos el favorito a partir del idBreed
-        val favorite=FavoritesEntity(null, cat.id.toString(), cat.name, "Cat", cat.path_image,cat.description, Date().toString())
+        val favorite=FavoritesEntity(null, breedCat.id.toString(), breedCat.name, "Cat", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat.path_image,breedCat.description, Date().toString())
         //val favorite= FavoritesRepository.getById(context,id)
         FavoritesRepository.insert(favoritesDao,favorite)
         //FavoritesRepository.insert(context,favorite)
         //Log.d("TAG","FisViewModel die: preparada el id: "+idBreed+"para añadir a favoritos a "+favorite.toString())
     }
-    fun createFavorite(dog: DogTL){
-        val favorite=FavoritesEntity(null, dog.id.toString(), dog.name, "Dog", dog.path_image?:"Not image",dog.breed_id, Date().toString())
+    fun createFavorite(breedDog: BreedDogTL){
+        val favorite=FavoritesEntity(null, breedDog.id.toString(), breedDog.name, "Dog", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedDog.path_image,breedDog.breed_id, Date().toString())
         FavoritesRepository.insert(favoritesDao,favorite)
     }
-    fun createFavorite(fish: Fish?){
-        if(fish!=null){
-            val favorite=FavoritesEntity(null, fish.id.toString(), fish.name, "Fish", fish.img_src_set?:"Not image",fish.meta.toString(), Date().toString())
+    fun createFavorite(specieFish: SpecieFishTL?){
+        if(specieFish!=null){
+            val favorite=FavoritesEntity(null, specieFish.id.toString(), specieFish.name, "Fish", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+specieFish.path_image,specieFish.name_es, Date().toString())
             FavoritesRepository.insert(favoritesDao,favorite)
         }
     }

@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -49,6 +50,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.ui.components.getContactAnnotated
+import es.tipolisto.breeds.ui.components.getTermsAnnotated
+import es.tipolisto.breeds.ui.components.getWebAnnotated
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.utils.MediaPlayerClient
 
@@ -166,53 +170,41 @@ fun SettingsScreenPreview() {
 @Composable
 fun Texts(){
     Spacer(modifier = Modifier.background(Color.Magenta))
-    val webAnnotatedString = buildAnnotatedString {
-        append("Web: ")
-        pushStringAnnotation(tag = "web", annotation = "https://breeds.tipolisto.es")
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-            append("breeds.tipolisto.es")
-        }
-        pop()
-    }
-    val contactAnnotatedString = buildAnnotatedString {
-        append("Contact ")
-        pushStringAnnotation(tag = "contact", annotation = "email://adm.tipolisto.es")
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-            append("email://adm.tipolisto.es")
-        }
-        append(".")
-        pop()
-    }
-    val termsAnnotatedString = buildAnnotatedString {
-        pushStringAnnotation(tag = "terms", annotation = "https://google.com/terms")
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-            append("Terms of use")
-        }
-        pop()
-    }
+
+    val uriHandler= LocalUriHandler.current
+    val webAnnotated= getWebAnnotated()
+    val termsAnnotated = getTermsAnnotated()
+    val contactAnnotated=getContactAnnotated()
     Column (modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(15.dp)){
         ClickableText(
-            text = webAnnotatedString,
-            style = MaterialTheme.typography.bodyLarge,
+            text = webAnnotated,
             onClick = { offset ->
-                webAnnotatedString.getStringAnnotations(tag = "web", start = 0, end = webAnnotatedString.length)
-                Log.d("TAG","Click")
+                val uri= webAnnotated.getStringAnnotations(tag = "web", start = offset, end = offset).firstOrNull()?.item
+                if(uri!=null)
+                    uriHandler.openUri(uri)
+                Log.d("TAG","Click en web")
             }
         )
         //Spacer(modifier = Modifier.size(10.dp))
-        ClickableText(text = contactAnnotatedString, style = MaterialTheme.typography.bodyLarge, onClick = { offset ->
-            contactAnnotatedString.getStringAnnotations(
-                tag = "contact",
-                start = offset,
-                end = offset
-            )
-        })
+        ClickableText(
+            text = termsAnnotated,
+            onClick = { offset ->
+                val uri=termsAnnotated.getStringAnnotations(tag = "contact",start = offset, end = offset).firstOrNull()?.item
+                if(uri!=null)
+                    uriHandler.openUri(uri)
+                Log.d("TAG","Click en contact")
+            }
+        )
         //Spacer(modifier = Modifier.size(10.dp))
-        ClickableText(text = termsAnnotatedString, style = MaterialTheme.typography.bodyLarge, onClick = { offset ->
-            termsAnnotatedString.getStringAnnotations(tag = "terms", start = offset, end = offset)/*.firstOrNull()?.let {
-                    Log.d("terms URL", it.item)
-                }*/
-        })
+        ClickableText(
+            text = contactAnnotated,
+            onClick = { offset ->
+                val uri=contactAnnotated.getStringAnnotations(tag = "terms", start = offset, end = offset).firstOrNull()?.item
+                if(uri!=null)
+                    uriHandler.openUri(uri)
+                Log.d("TAG","Click en terminos")
+            }
+        )
         Text(text = stringResource(id = R.string.settings_description))
     }
 }

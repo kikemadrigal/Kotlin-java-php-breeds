@@ -1,5 +1,8 @@
 package es.tipolisto.breeds.ui.views.screens.login
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,12 +38,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
+import es.tipolisto.breeds.ui.components.MyToast
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.LoginViewModel
 
@@ -55,7 +63,7 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController){
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(text = "Records")
+                        Text(text = "Upload Score mix")
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary
@@ -86,32 +94,41 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController){
 
 @Composable
 fun Login(loginViewModel: LoginViewModel){
-    val email: String by loginViewModel.email.observeAsState(initial = "")
+    val name: String by loginViewModel.name.observeAsState(initial = "")
     val password: String by loginViewModel.password.observeAsState(initial = "")
     val loginEnable: Boolean by loginViewModel.loginEnable.observeAsState(initial = false)
+    //val message: String by loginViewModel.messageLiveData.observeAsState(initial = "")
 
-
+    val recordMix=loginViewModel.getRecordMix()
     Column (modifier=Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally){
-        HeadImage(Modifier.align(Alignment.CenterHorizontally))
-       //Spacer(modifier = Modifier.padding(16.dp))
-        EmailField(email, {loginViewModel.onLoginChange(it,password)})
+        val context=LocalContext.current
         Spacer(modifier = Modifier.padding(4.dp))
-        PasswordField(password,{loginViewModel.onLoginChange(email,it)})
-        Spacer(modifier = Modifier.padding(8.dp))
-        ForgotPassword()
+        NameField(name, {loginViewModel.onNameChange(it)})
+        Spacer(modifier = Modifier.padding(4.dp))
+        PasswordField(password,{loginViewModel.onPasswordChange(it)})
+        Spacer(modifier = Modifier.padding(4.dp))
+        //ForgotPassword()
+        TextField(value =recordMix.toString() , onValueChange ={}, modifier=Modifier.fillMaxWidth(), enabled = false)
         Spacer(modifier = Modifier.padding(16.dp))
-        LoginButton(loginEnable)
-            {
-                loginViewModel.onLoginSelected()
-            }
-
+        LoginButton(loginEnable){
+            if(recordMix>100)
+                loginViewModel.saveScore(context,name, password, recordMix)
+            else
+                Toast.makeText(context,"La puntuación tiene que ser mayor de 100", Toast.LENGTH_LONG).show()
+        }
+        //Text(text = message, modifier=Modifier.fillMaxWidth())
+        HeadImage(Modifier.align(Alignment.CenterHorizontally))
     }
 }
-
 @Composable
-fun LoginButton(loginEnabled:Boolean, onLoginSelected:()->Unit) {
+fun LoginButton(loginEnabled:Boolean, saveScore:()->Unit) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    Log.d("TAG3", "login button")
     Button(
-        onClick = { onLoginSelected },
+        onClick = {
+            saveScore()
+            keyboardController?.hide()
+         },
         modifier= Modifier
             .fillMaxWidth()
             .height(40.dp),
@@ -121,29 +138,16 @@ fun LoginButton(loginEnabled:Boolean, onLoginSelected:()->Unit) {
         Text(text = "Iniciar sesion")
     }
 }
-
 @Composable
-fun ForgotPassword() {
-    Text(text = "Olvidaste la contraseña", modifier=Modifier.clickable {  })
-}
-
-@Composable
-fun HeadImage(modifier: Modifier){
-    Image(modifier=modifier.height(400.dp),painter = painterResource(id = R.drawable.login), contentDescription = "Header")
-}
-
-
-@Composable
-fun EmailField(email:String, onTextFielChange:(String)->Unit){
+fun NameField(email:String, onTextFielChange:(String)->Unit){
     TextField(
         value = email,
         onValueChange ={onTextFielChange(it)},
         modifier=Modifier.fillMaxWidth(),
-        placeholder = { Text(text="eamil") },
+        placeholder = { Text(text="name") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
     )
 }
-
 @Composable
 fun PasswordField(password:String, onTextFielChange: (String) -> Unit){
     TextField(
@@ -154,3 +158,16 @@ fun PasswordField(password:String, onTextFielChange: (String) -> Unit){
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )
 }
+
+
+
+@Composable
+fun HeadImage(modifier: Modifier){
+    Image(modifier=modifier.height(400.dp),painter = painterResource(id = R.drawable.login), contentDescription = "Header")
+}
+
+
+
+
+
+

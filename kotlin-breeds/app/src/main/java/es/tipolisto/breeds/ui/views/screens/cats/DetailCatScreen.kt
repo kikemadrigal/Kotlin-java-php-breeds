@@ -54,6 +54,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
+import es.tipolisto.breeds.data.models.cat.BreedCatTL
 import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
@@ -62,6 +63,7 @@ import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
+import es.tipolisto.breeds.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +73,7 @@ fun DetailCatScreen(
     idCat:Int,
     favoritesViewModel: FavoritesViewModel
 ){
-    val cat = catsViewModel.getCatById(idCat)
+    val cat = catsViewModel.getBreedCatById(idCat)
     //Le ponemos si está en la lista de favoritos o no
     favoritesViewModel.checkIsInFavorites(cat?.id?:0)
     //val isFavorite=favoritesViewModel.isFavorite
@@ -108,7 +110,7 @@ fun DetailCatScreen(
                                 //Si no está en la lista de favoritos
                                 }else{
                                     favoritesViewModel.createFavorite(cat)
-                                    Toast.makeText(context, "Added cat to favorites", Toast.LENGTH_LONG)
+                                    Toast.makeText(context, "Added breed cat to favorites", Toast.LENGTH_LONG)
                                         .show()
                                     Log.d("TAG", "No está en favoritos")
                                     favoritesViewModel.setFavorite(true)
@@ -131,8 +133,8 @@ fun DetailCatScreen(
             }
 
         ) {
-            val cat = catsViewModel.getCatById(idCat)
-            if (cat == null) navController.navigate(AppScreens.ListCatsScreen.route)
+            val breedCat = catsViewModel.getBreedCatById(idCat)
+            if (breedCat == null) navController.navigate(AppScreens.ListCatsScreen.route)
              Card(
                 modifier = Modifier
                     .padding(it)
@@ -146,8 +148,8 @@ fun DetailCatScreen(
                     modifier=Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
-                    CatImageDetail(cat)
-                    CatDescriptionDetail(cat)
+                    CatImageDetail(breedCat)
+                    CatDescriptionDetail(breedCat)
                 }
             }
         }//Final del scafold
@@ -155,17 +157,18 @@ fun DetailCatScreen(
 }
 
 @Composable
-private fun getDetail(cat: Cat):String{
-    var content: String = cat.temperament+ "\n"+
-            cat.origin + "\n"+
-            cat.country_code+ "\n"+
-            cat.description + "\n"
+private fun getDetail(breedCat: BreedCatTL):String{
+    var content: String = breedCat.temperament_es+ "\n"+
+            breedCat.origin_es + "\n"+
+            breedCat.morphology_es + "\n"+
+            breedCat.country_code+ "\n"+
+            breedCat.description_es + "\n"
     return content
 }
 
 @Composable
-fun CatImageDetail(cat: CatTL?){
-    val url = cat?.path_image
+fun CatImageDetail(breedCat: BreedCatTL?){
+    val url = Constants.Companion.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat?.path_image
     val model by remember { mutableStateOf(url) }
     AsyncImage(
         model = model,
@@ -196,115 +199,115 @@ fun createLink(text:String){
 }
 
 @Composable
-fun CatDescriptionDetail(cat: CatTL?){
-    if (cat != null) {
-        Text( text = cat.name + ".", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center, modifier=Modifier.fillMaxWidth())
-        //Text( text = getDetail(cat = cat) + ".", style = MaterialTheme.typography.bodyMedium)
-        //Text(text = cat.wikipedia_url + ".")
-        //createLink(cat.wikipedia_url)
-        /*Spacer(modifier = Modifier.size(10.dp))
+fun CatDescriptionDetail(breedCat: BreedCatTL?){
+    if (breedCat != null) {
+        Text( text = breedCat.name + ".", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center, modifier=Modifier.fillMaxWidth())
+        Text( text = getDetail(breedCat = breedCat) + ".", style = MaterialTheme.typography.bodyMedium)
+        Text(text = breedCat.wikipedia_url + ".")
+        createLink(breedCat.wikipedia_url)
+        Spacer(modifier = Modifier.size(10.dp))
         Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             //Con modifier.wight le decimos que vamos a tener 2 huecos a reparti con 1f le decimos que uno cada uno
             Text(text = stringResource(id = R.string.cat_indoor), modifier=Modifier.weight(1f))
-            RatingBar(cat.indoor.toFloat(), modifier= Modifier
+            RatingBar(breedCat.indoor.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row(modifier=Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.cat_adaptability), modifier=Modifier.weight(1f))
-            RatingBar(cat.adaptability.toFloat(), modifier= Modifier
+            RatingBar(breedCat.adaptability.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row(modifier=Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.cat_affection_level), modifier=Modifier.weight(1f))
-            RatingBar( cat.affection_level.toFloat(), modifier= Modifier
+            RatingBar( breedCat.affection_level.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row(modifier=Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.cat_child_friendly), modifier=Modifier.weight(1f))
-            RatingBar(  cat.child_friendly.toFloat(), modifier= Modifier
+            RatingBar(  breedCat.child_friendly.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row(modifier=Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.cat_cat_friendly), modifier=Modifier.weight(1f))
-            RatingBar(cat.cat_friendly.toFloat(), modifier= Modifier
+            RatingBar(breedCat.cat_friendly.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_dog_friendly), modifier=Modifier.weight(1f))
-            RatingBar(cat.dog_friendly.toFloat(), modifier= Modifier
+            RatingBar(breedCat.dog_friendly.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_energy_level), modifier=Modifier.weight(1f))
-            RatingBar(cat.energy_level.toFloat(), modifier= Modifier
+            RatingBar(breedCat.energy_level.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_grooming), modifier=Modifier.weight(1f))
-            RatingBar(cat.grooming.toFloat(), modifier= Modifier
+            RatingBar(breedCat.grooming.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_health_issues), modifier=Modifier.weight(1f))
-            RatingBar(  cat.health_issues.toFloat(), modifier= Modifier
+            RatingBar(  breedCat.health_issues.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp) )
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_intelligence), modifier=Modifier.weight(1f))
-            RatingBar(cat.intelligence.toFloat(), modifier= Modifier
+            RatingBar(breedCat.intelligence.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row(modifier=Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.cat_shedding_level), modifier=Modifier.weight(1f))
-            RatingBar(  cat.shedding_level.toFloat() , modifier= Modifier
+            RatingBar(  breedCat.shedding_level.toFloat() , modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_social_needs), modifier=Modifier.weight(1f))
-            RatingBar(cat.social_needs.toFloat(), modifier= Modifier
+            RatingBar(breedCat.social_needs.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row(modifier=Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.cat_stranger_friendly), modifier=Modifier.weight(1f))
-            RatingBar( cat.stranger_friendly.toFloat(), modifier= Modifier
+            RatingBar( breedCat.stranger_friendly.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp) )
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_vocalisation), modifier=Modifier.weight(1f))
-            RatingBar(cat.vocalisation.toFloat(), modifier= Modifier
+            RatingBar(breedCat.vocalisation.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_experimental), modifier=Modifier.weight(1f))
-            RatingBar(cat.experimental.toFloat(), modifier= Modifier
+            RatingBar(breedCat.experimental.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_suppressed_tail), modifier=Modifier.weight(1f))
-            RatingBar(  cat.suppressed_tail.toFloat(), modifier= Modifier
+            RatingBar(  breedCat.suppressed_tail.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
         }
         Row (modifier=Modifier.fillMaxWidth()){
             Text(text = stringResource(id = R.string.cat_short_legs), modifier=Modifier.weight(1f))
-            RatingBar(cat.short_legs.toFloat(), modifier= Modifier
+            RatingBar(breedCat.short_legs.toFloat(), modifier= Modifier
                 .weight(1f)
                 .size(30.dp))
-        }*/
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.Manifest
 class Constants {
     companion object{
         const val URL_BASE="https://breeds.tipolisto.es/api/"
+        const val URL_BASE_IMAGES_TIPOLISTO_ES="https://breeds.tipolisto.es/"
         //const val URL_BASE_CAT="https://api.thecatapi.com/v1/"
         const val URL_BASE_CAT="https://breeds.tipolisto.es/api/breedCats.php"
         //const val URL_BASE_DOG="https://api.thedogapi.com/v1/"

@@ -2,6 +2,8 @@ package es.tipolisto.breeds.data.repositories
 
 import android.util.Log
 import es.tipolisto.breeds.data.models.cat.Cat
+import es.tipolisto.breeds.data.models.cat.CatTL
+import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.dog.ImageDog
@@ -21,37 +23,72 @@ class DogRepository {
                 DogProvider.listDogs=listBreedsDog
             }
         }
-
+        suspend fun loadBreedDogsAndInsertBuffer() {
+            val service= RetrofitClient.getRetrofitService()
+            val response=service.getAllBreedDogs()
+            val listBreedsDogs=response.body()
+            if (listBreedsDogs != null) DogProvider.listBreedDogs=listBreedsDogs
+        }
         fun getListDogFromBuffer()=DogProvider.listDogs
 
-        fun getRandomDogFromBuffer(restricted:List<DogTL?>): DogTL?{
+        fun getRandomListDogsFromBuffer(): MutableList<DogTL?>{
+            var listDogs= mutableListOf<DogTL?>()
             var dog : DogTL?=null
             if(!DogProvider.listDogs.isEmpty()){
-                val random = Random.nextInt(DogProvider.listDogs.size)
-                Log.d("TAG3", "DogRepository dice: el random es: "+random.toString())
-                dog=DogProvider.listDogs[random]
-                Log.d("TAG3", "DogRepository dice: el random es: "+dog.toString())
-                for(i in restricted){
-                    if(dog.name.equals(i?.name)) {
-                        getRandomDogFromBuffer(restricted)
-                    }
+                //Obtenemos los 3 números aleatorios diferentes
+                val setRandom= mutableSetOf<Int>()
+                //Como los et no pueden tener repetidos los metemos en un set
+                while (setRandom.size<3){
+                    setRandom.add(Random.nextInt(CatProvider.listCats.size))
+                }
+                for(i in setRandom){
+                    listDogs.add(DogProvider.listDogs[i])
                 }
             }else{
                 Log.d("TAG3", "la lista esta vacia")
             }
-            return dog
+            return listDogs
         }
 
-        fun getDogFromBreedIdInBuffer(referenceBreedId: String):DogTL?{
-            var dog: DogTL?=null
-            DogProvider.listDogs.forEach{
+        /**
+         * devuelve la raza de perro a partir de su breed_id
+         * la relacción entre la tabla dog y breed_dog es por el breed_id
+         * ver:https://breeds.tipolisto.es/sql/estructura&20bd.sql
+         */
+        fun getBreedDogByBreedIdFromBuffer(breed_id: String?):BreedDogTL?{
+            var breedDog: BreedDogTL?=null
+            DogProvider.listBreedDogs.forEach{
                 val reference=it.breed_id;
-                if(reference!=null ){
-                  if(reference.equals(referenceBreedId)) dog=it
-                }
-
+                if(breed_id!=null)
+                    if(reference.equals(breed_id)) breedDog=it
             }
-            return dog
+            return breedDog
+        }
+
+        /**
+         * Devuelve la raza del perro a partir de su id
+         * solo utilziada en el detailScreen
+         */
+        fun getBreedDogByIdFromBuffer(id: Int?):BreedDogTL?{
+            var breedDog: BreedDogTL?=null
+            DogProvider.listBreedDogs.forEach{
+                val reference=it.id;
+                if(reference==id) breedDog=it
+            }
+            return breedDog
+        }
+
+        /**
+         * Devuelve la raza deñ perro a partir de su breed_id
+         * solo utilizado en el dogViewmodel
+         */
+        fun getBreedDogNameByBreedIdDog(breed_id:String?):BreedDogTL?{
+            var breedDog: BreedDogTL?=null
+            DogProvider.listBreedDogs.forEach {
+                val idDog = it.breed_id;
+                if (idDog.equals(breed_id)) breedDog = it
+            }
+            return breedDog
         }
 
         fun getDogFromIdInBuffer(id: String):DogTL?{

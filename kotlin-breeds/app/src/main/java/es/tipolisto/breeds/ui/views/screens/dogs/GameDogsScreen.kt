@@ -35,8 +35,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,23 +57,27 @@ import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.data.repositories.CatRepository
+import es.tipolisto.breeds.data.repositories.DogRepository
+import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
 import es.tipolisto.breeds.ui.components.onBackPressed
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
+import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.AudioEffectsType
+import es.tipolisto.breeds.utils.Constants
 import es.tipolisto.breeds.utils.MediaPlayerClient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, mediaPlayerClient: MediaPlayerClient) {
+fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, recordsViewModel: RecordsViewModel, mediaPlayerClient: MediaPlayerClient) {
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         if (!dogsViewModel.justOnce) {
-
             dogsViewModel.get3RamdomDogs()
             dogsViewModel.justOnce = true
         }
@@ -106,7 +113,7 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, me
                     },
                     actions = {
                         IconButton(onClick = {
-                            if(dogsViewModel.getAll().isEmpty()){
+                            if(dogsViewModel.getAllBreedsDogs().isEmpty()){
                                 Toast.makeText(context,"Empty list",Toast.LENGTH_LONG).show()
                             }else{
                                 navController.navigate(AppScreens.ListDogsScreen.route)
@@ -119,7 +126,7 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, me
                 )
             }
         ) {
-            GameDogScreenContent(it, dogsViewModel, navController, mediaPlayerClient)
+            GameDogScreenContent(it, dogsViewModel, recordsViewModel, navController, mediaPlayerClient)
         }
     }
 }
@@ -133,12 +140,16 @@ fun GameDogScreen() {
 }
 
 @Composable
-fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewModel,navController: NavController, mediaPlayerClient: MediaPlayerClient){
+fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewModel,recordsViewModel: RecordsViewModel,navController: NavController, mediaPlayerClient: MediaPlayerClient){
+    var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
+    val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
+
+
     Column (
         modifier = Modifier
             .fillMaxHeight()
-            .padding(paddingsValues),
-            //.verticalScroll(rememberScrollState()),
+            .padding(paddingsValues)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         if(dogsViewModel.stateIsLoading){
@@ -146,9 +157,25 @@ fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewMod
         }else
             MyCircularProgressIndicator(isDisplayed = false)
         if(dogsViewModel.gameOver) {
-            dogsViewModel.initGame()
-            navController.popBackStack()
-            navController.navigate(AppScreens.MenuScreen.route)
+            recordsViewModel.checkRecord(dogsViewModel.state.score)
+            if(stateNewRecord) {
+                MyAlertDialogNewRecord(
+                    stateNewRecord,
+                    {
+                        showNewRecordDialog = false
+                    },
+                    { name->
+                        recordsViewModel.insertNewRecord(name,dogsViewModel.state.score, "dog")
+                        dogsViewModel.initGame()
+                        navController.popBackStack()
+                        navController.navigate(AppScreens.MenuScreen.route)
+                    }
+                )
+            }else {
+                dogsViewModel.initGame()
+                navController.popBackStack()
+                navController.navigate(AppScreens.MenuScreen.route)
+            }
         }else{
             DogHud(dogsViewModel)
             DrawImageDog(dogsViewModel)
@@ -183,19 +210,18 @@ fun DogHud(dogsViewModel: DogsViewModel){
 @Composable
 fun DrawImageDog(dogsViewModel: DogsViewModel){
     val dog=dogsViewModel.getActiveDog()
-    if(dog==null || dog.path_image==null ){
+    if(dog==null){
         Image(
             painter = painterResource(id = R.drawable.without_image),
             contentDescription = "Splash breeds",
             Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+                .height(250.dp)
         )
-        dogsViewModel.get3RamdomDogs()
     }else{
         //dogsViewModel.stateIsLoading=true
         AsyncImage(
-            model = "https://breeds.tipolisto.es/"+dog.path_image,
+            model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+dog.path_image,
             contentDescription = "Select a breed",
             modifier = Modifier
                 .size(400.dp, 300.dp)
@@ -219,8 +245,8 @@ fun DogTests(dogsViewModel: DogsViewModel, mediaPlayerClient:MediaPlayerClient){
         }
     }
     val correctAnswer=dogsViewModel.state.correctAnswer
-    val listCatRandom=dogsViewModel.state.listRandomDogs
-    for (i in 0..<listCatRandom.size) {
+    val listDogRandom=dogsViewModel.state.listRandomDogs
+    for (i in 0..<listDogRandom.size) {
         Spacer(modifier = Modifier.size(10.dp))
         TextButton(
             modifier = Modifier.fillMaxWidth(),
@@ -233,14 +259,16 @@ fun DogTests(dogsViewModel: DogsViewModel, mediaPlayerClient:MediaPlayerClient){
                 dogsViewModel.get3RamdomDogs()
             }
         ) {
-            val text = (i+1).toString()+")  "+dogsViewModel.state.listRandomDogs.get(i)?.name
+            val breedDog=dogsViewModel.state.listRandomDogs[i]?.breed_id
+            val breedDogName= DogRepository.getBreedDogByBreedIdFromBuffer(breedDog)
+            val text=(i+1).toString()+")  "+ breedDogName?.name_es+"."
             if(dogsViewModel.clickPressed){
                 Text(
                     text = text,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color=if(correctAnswer==i)Color.Black else Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     modifier= Modifier
                         .fillMaxWidth()
                         .background(if (correctAnswer == i) Color.Green else Color.Red)
@@ -248,9 +276,9 @@ fun DogTests(dogsViewModel: DogsViewModel, mediaPlayerClient:MediaPlayerClient){
             }else{
                 Text(
                     text = text,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground ,
                     modifier=Modifier
                         .fillMaxWidth()

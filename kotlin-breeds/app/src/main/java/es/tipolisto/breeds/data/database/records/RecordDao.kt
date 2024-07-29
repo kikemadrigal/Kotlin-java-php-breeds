@@ -48,6 +48,10 @@ interface RecordDao {
     @Query("SELECT max(score) FROM RecordEntity")
     fun getMaxRecordEntities(): Int
 
+    @Query("SELECT max(score) FROM RecordEntity WHERE typeAnimal='mix'")
+    fun getMaxRecordMix(): Int
+
+
 
 
 

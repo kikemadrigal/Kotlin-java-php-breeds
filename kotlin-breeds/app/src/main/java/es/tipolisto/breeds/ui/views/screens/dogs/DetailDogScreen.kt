@@ -1,9 +1,7 @@
 package es.tipolisto.breeds.ui.views.screens.dogs
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,29 +38,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
-import es.tipolisto.breeds.data.models.dog.Dog
-import es.tipolisto.breeds.data.models.dog.DogTL
+import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
-import es.tipolisto.breeds.ui.components.MyToast
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
+import es.tipolisto.breeds.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailDogScreen(
     navController: NavController,
     dogsViewModel: DogsViewModel,
-    reference_image_id:String,
+    id:Int,
     favoritesViewModel: FavoritesViewModel
 ){
-    val dog = dogsViewModel.getDogByReferenceImageId(reference_image_id)
-    favoritesViewModel.checkIsInFavorites(dog?.id.toString())
+    val breedDog = dogsViewModel.getBreedDogById(id)
+    favoritesViewModel.checkIsInFavorites(breedDog?.id.toString())
     val isFavorite: Boolean by favoritesViewModel.isFavorite.observeAsState(initial = false)
     val context= LocalContext.current
     val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
@@ -84,16 +80,16 @@ fun DetailDogScreen(
                     },
                     actions = {
                         IconButton(onClick = {
-                           if (dog != null) {
+                           if (breedDog != null) {
                                if (isFavorite){
-                                   val list=favoritesViewModel.getFavoritesByIdAnimal(dog.id.toString())
+                                   val list=favoritesViewModel.getFavoritesByIdAnimal(breedDog.id.toString())
                                    if(list!=null)
                                        favoritesViewModel.delete(list[0])
                                    favoritesViewModel.setFavorite(false)
                                //Si no está en la lista de favoritos
                                }else{
-                                   favoritesViewModel.createFavorite(dog)
-                                   Toast.makeText(context, "Added cat to favorites", Toast.LENGTH_LONG)
+                                   favoritesViewModel.createFavorite(breedDog)
+                                   Toast.makeText(context, "Added breed dog to favorites", Toast.LENGTH_LONG)
                                        .show()
                                    favoritesViewModel.setFavorite(true)
                                }
@@ -107,15 +103,15 @@ fun DetailDogScreen(
                         }) {
                             Image(
                                 painter = painterResource(id = R.drawable.favorite_list),
-                                contentDescription = "Dog list"
+                                contentDescription = "breedDog list"
                             )
                         }
                     }
                 )
             }
         ) {
-            val dog = dogsViewModel.getDogByReferenceImageId(reference_image_id)
-            val url=dog?.path_image
+            val breedDog = dogsViewModel.getBreedDogById(id)
+            val url=breedDog?.path_image
             var model by remember { mutableStateOf(url) }
             Card(
                 modifier = Modifier
@@ -132,21 +128,21 @@ fun DetailDogScreen(
                         .padding(20.dp),
                 ) {
                     AsyncImage(
-                        model = model,
-                        contentDescription = "Image dog",
+                        model = Constants.Companion.URL_BASE_IMAGES_TIPOLISTO_ES+model,
+                        contentDescription = "Image breedDog",
                         modifier = Modifier
                             .size(300.dp, 200.dp),
                         contentScale = ContentScale.Fit
                     )
-                    if (dog != null) {
+                    if (breedDog != null) {
                         Text(
-                            text = dog.name,
+                            text = breedDog.name_es,
                             style = MaterialTheme.typography.titleMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
                         Text(
-                            text = getDetailDog(dog) + "",
+                            text = getDetailDog(breedDog) + "",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -156,23 +152,23 @@ fun DetailDogScreen(
     }//Final del theme
 }
 @Composable
-fun DetailDogScreenContent(it:PaddingValues, dog: Dog){
+fun DetailDogScreenContent(it:PaddingValues, breedDog: BreedDogTL){
     Column(modifier = Modifier.padding(20.dp)){
 
     }
 }
 
 @Composable
-private fun getDetailDog(dog: DogTL):String{
-    var content: String =  dog.name+ "\n"
-    /*content +=
-        stringResource(id = R.string.dog_bred_for)+": "+ dog.name + "\n"+
-        stringResource(id = R.string.dog_breed_group)+": "+dog.family+ "\n"+
-        stringResource(id = R.string.dog_life_span)+": "+dog.life_span + "\n" +
-        stringResource(id = R.string.dog_temperament)+": "+dog.temperament + "\n" +
-        stringResource(id = R.string.dog_origin)+": "+dog.origin + "\n"+
-        stringResource(id = R.string.dog_weight)+": "+dog.weight + "\n"+
-        stringResource(id = R.string.dog_height)+": "+dog.height + "\n"*/
+private fun getDetailDog(breedDog: BreedDogTL):String{
+    var content=stringResource(id = R.string.dog_description)+": "+ breedDog.description_es + "\n"+
+        stringResource(id = R.string.dog_bred_for)+": "+ breedDog.bred_for_es + "\n"+
+        stringResource(id = R.string.dog_breed_group)+": "+breedDog.breed_group_es+ "\n"+
+        stringResource(id = R.string.dog_life_span)+": "+breedDog.life_span + "\n" +
+        stringResource(id = R.string.dog_temperament)+": "+breedDog.temperament_es + "\n" +
+        stringResource(id = R.string.dog_origin)+": "+breedDog.origin_es + "\n"+
+        stringResource(id = R.string.dog_morphology)+": "+breedDog.morphology_es + "\n"+
+        stringResource(id = R.string.dog_weight)+": "+breedDog.weight + "\n"+
+        stringResource(id = R.string.dog_height)+": "+breedDog.height + "\n"
     return content
 }
 
