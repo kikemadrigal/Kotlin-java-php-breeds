@@ -5,7 +5,10 @@ Class Fish {
 	private $name;
 	private $name_es;
 	private $specie_id;
+	private $points;
+	private $total_points;
 	private $path_image;
+	private $validate;
 	private $date;
 	private $creator_id;
 	
@@ -29,8 +32,17 @@ Class Fish {
     function set_specie_id($specie_id){
 		$this->specie_id=$specie_id;
 	}
+	function set_points($points){
+		$this->points=$points;
+	}
+	function set_total_points($total_points){
+		$this->total_points=$total_points;
+	}
     function set_path_image($path_image){
 		$this->path_image=$path_image;
+	}
+	function set_validate($validate){
+		$this->validate=$validate;
 	}
     function set_date($date){
 		$this->date=$date;
@@ -53,8 +65,17 @@ Class Fish {
     function get_specie_id(){
 		return $this->specie_id;
 	}
+	function get_points(){
+		return $this->points;
+	}
+	function get_total_points(){
+		return $this->total_points;
+	}
     function get_path_image(){
 		return $this->path_image;
+	}
+	function get_validate(){
+		return $this->validate;
 	}
     function get_date(){
 		return $this->date;

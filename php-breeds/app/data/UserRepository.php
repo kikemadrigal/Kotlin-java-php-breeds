@@ -73,14 +73,14 @@ class UserRepository{
 	}
 
 
-	function obtenerNombreusuario($idusuario){
+	public static function getNameById($id){
 		$basededatos= new MysqliClient();
 		$basededatos->conectar_mysql();
-		$consulta  = "SELECT nombreusuario FROM users WHERE idusuario='".$idusuario."' ";
+		$consulta  = "SELECT name FROM users WHERE id='".$id."' ";
 		$resultado=$basededatos->ejecutar_sql($consulta);
 		while ($linea = mysqli_fetch_array($resultado )) 
 		{
-			return $linea['nombreusuario'];
+			return $linea['name'];
 		}
 		$basededatos->desconectar();
 	}
@@ -309,6 +309,20 @@ class UserRepository{
 		$basededatos= new MysqliClient();
 		$basededatos->conectar_mysql();
 		$consulta  = "SELECT email FROM users WHERE email='".$correo."' ";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		$numeroFilas=mysqli_num_rows($resultado);
+		if($numeroFilas==false){
+			return false;	
+		}else{
+			return true;
+		}
+		$basededatos->desconectar();
+	}	
+
+	public static function comprobarSiExisteElNombreDeUsuario($nombre){
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT name FROM users WHERE name='".$nombre."' ";
 		$resultado=$basededatos->ejecutar_sql($consulta);
 		$numeroFilas=mysqli_num_rows($resultado);
 		if($numeroFilas==false){

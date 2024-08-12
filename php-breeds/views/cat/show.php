@@ -20,19 +20,30 @@ include_once("./views/templates/document-start.php");
                         echo "Breed empty";
                     else
                         echo "<p><b>Breed: ".$breedCatName."</b></p>";
+                    
+                    if($cat->get_family()!=null)
+                        echo "<p>Family: ".$cat->get_family()."</p>";
+                    if($cat->get_description()!=null)
+                        echo "<p>Description: ".$cat->get_description()."</p>";
+                    if($cat->get_description_es()!=null)
+                        echo "<p>Description_es: ".$cat->get_description_es()."</p>";
+                    if($cat->get_year_of_birth()!=null)
+                        echo "<p>year of birth: ".$cat->get_year_of_birth()."</p>";
                     $sexo="";
-                    if($cat->get_sex()==0){
-                        $sexo="Femenino";
-                    }else{
-                        $sexo="Masculino";
+                    if($cat->get_sex()!=null){
+                        if($cat->get_sex()==0){
+                            $sexo="Femenino";
+                        }else{
+                            $sexo="Masculino";
+                        }
+                        echo "<p>sex: ".$sexo."</p>";
                     }
-                    echo "<p>Family: ".$cat->get_family()."</p>";
-                    echo "<p>Description: ".$cat->get_description()."</p>";
-                    echo "<p>Description_es: ".$cat->get_description_es()."</p>";
-                    echo "<p>year of birth: ".$cat->get_year_of_birth()."</p>";
-                    echo "<p>sex: ".$sexo."</p>";
-                    echo "<p>address: ".$cat->get_address()."</p>";
-                       // echo "<p>vaccines: ".$cat->get_description()."</p>";
+                    if($cat->get_address()!=null)
+                        echo "<p>address: ".$cat->get_address()."</p>";
+
+                    echo "<p>Points: ".$cat->get_points()."</p>";
+                    echo "<p>Total points: ".$cat->get_total_points()."</p>";    
+                    echo "<p><a href='".PATHSERVER."Cat/showRanking'>Mostrar ranking bellezas</a>";
                 echo "</div>";
             }else{
                 echo "Not data";

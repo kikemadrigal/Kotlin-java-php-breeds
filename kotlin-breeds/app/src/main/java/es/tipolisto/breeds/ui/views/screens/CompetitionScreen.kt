@@ -2,8 +2,7 @@ package es.tipolisto.breeds.ui.views.screens
 
 
 
-import android.content.Context
-import android.util.Log
+
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -22,8 +21,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,7 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.isLiveLiteralsEnabled
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,9 +54,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import es.tipolisto.breeds.R
-import es.tipolisto.breeds.data.database.records.RecordEntity
 import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.models.dog.DogTL
 import es.tipolisto.breeds.data.models.fish.FishTL
@@ -65,21 +63,17 @@ import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.repositories.CatRepository
 import es.tipolisto.breeds.data.repositories.DogRepository
 import es.tipolisto.breeds.data.repositories.FishRepository
-import es.tipolisto.breeds.data.repositories.RecordsRepository
 import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
 import es.tipolisto.breeds.ui.components.onBackPressed
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
-import es.tipolisto.breeds.ui.viewModels.CatsViewModel
 import es.tipolisto.breeds.ui.viewModels.CompetitionViewModel
-import es.tipolisto.breeds.ui.viewModels.DogsViewModel
-import es.tipolisto.breeds.ui.viewModels.FishViewModel
 import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.AudioEffectsType
 import es.tipolisto.breeds.utils.Constants
 import es.tipolisto.breeds.utils.MediaPlayerClient
-import es.tipolisto.breeds.utils.Util
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,8 +90,7 @@ fun CompetitionScreen(navController: NavController, competitionViewModel:Competi
     }
     //Conrol del botón atrás
     BackHandler{
-        competitionViewModel.initGame()
-        onBackPressed(navController,context)
+        onBackPressed({competitionViewModel.initGame()},navController,context)
     }
 
     val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
@@ -115,11 +108,10 @@ fun CompetitionScreen(navController: NavController, competitionViewModel:Competi
                     navigationIcon={
                         IconButton(
                             onClick = {
-                                competitionViewModel.initGame()
-                                onBackPressed(navController,context)
+                                onBackPressed({competitionViewModel.initGame()},navController,context)
                             }
                         ){
-                            Icon(imageVector = Icons.Default.ArrowBack,contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back")
                         }
                     }
                 )
@@ -130,9 +122,7 @@ fun CompetitionScreen(navController: NavController, competitionViewModel:Competi
     }
 }
 
-fun checkNewRecord(context:Context) {
-    Toast.makeText(context, "Nuevo record!!",Toast.LENGTH_LONG).show()
-}
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -146,7 +136,7 @@ fun GameCompetitionScreen() {
 fun GameCompetitionScreenContent(paddingsValues:PaddingValues, competitionViewModel: CompetitionViewModel, recordsViewModel: RecordsViewModel, navController: NavController, mediaPlayerClient: MediaPlayerClient){
     var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
     val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
-
+    val context= LocalContext.current
 
     Column (
         modifier = Modifier
@@ -156,10 +146,6 @@ fun GameCompetitionScreenContent(paddingsValues:PaddingValues, competitionViewMo
         horizontalAlignment = Alignment.CenterHorizontally
         //verticalArrangement = Arrangement.Center
     ){
-        if(competitionViewModel.stateIsloading){
-            MyCircularProgressIndicator(isDisplayed = true)
-        }else
-            MyCircularProgressIndicator(isDisplayed = false)
         if(competitionViewModel.gameOver) {
             recordsViewModel.checkRecord(competitionViewModel.state.score)
             //Obtenemos el record que hay encima
@@ -171,10 +157,18 @@ fun GameCompetitionScreenContent(paddingsValues:PaddingValues, competitionViewMo
                     },
                     {
                         name->
-                        recordsViewModel.insertNewRecord(name,competitionViewModel.state.score, "mix")
-                        competitionViewModel.initGame()
-                        navController.popBackStack()
-                        navController.navigate(AppScreens.MenuScreen.route)
+                        if(name.length>30) Toast.makeText(context,"The name must have less than 30 characters",Toast.LENGTH_LONG).show()
+                        else if(name.length<3) Toast.makeText(context,"Name too short",Toast.LENGTH_LONG).show()
+                        else {
+                            recordsViewModel.insertNewRecord(
+                                name,
+                                competitionViewModel.state.score,
+                                "mix"
+                            )
+                            competitionViewModel.initGame()
+                            navController.popBackStack()
+                            navController.navigate(AppScreens.MenuScreen.route)
+                        }
                     }
                 )
             }else{
@@ -183,12 +177,15 @@ fun GameCompetitionScreenContent(paddingsValues:PaddingValues, competitionViewMo
                 navController.navigate(AppScreens.MenuScreen.route)
             }
         }else{
-            //catsViewModel.initGame()
             Hud(competitionViewModel)
             //Pintamos la imagen del gato activo
-            DrawImageCat(competitionViewModel)
+            DrawImageCompetition(competitionViewModel)
+            if(competitionViewModel.stateIsloading){
+                MyCircularProgressIndicator(isDisplayed = true)
+            }else
+                MyCircularProgressIndicator(isDisplayed = false)
             //Pondreos el resultado a verdadero o falso
-            CatTest(competitionViewModel, mediaPlayerClient)
+            CompetitionTest(competitionViewModel, mediaPlayerClient)
         }
     }
 }
@@ -221,7 +218,7 @@ fun Hud(competitionViewModel: CompetitionViewModel){
 
 
 @Composable
-fun DrawImageCat(competitionViewModel: CompetitionViewModel){
+fun DrawImageCompetition(competitionViewModel: CompetitionViewModel){
     //Cuando se ontenga el gato activo se repintará la imagen
     val animalType= competitionViewModel.getActive()
     var path_image=""
@@ -240,9 +237,12 @@ fun DrawImageCat(competitionViewModel: CompetitionViewModel){
         )
     }else{
         competitionViewModel.stateIsloading=true
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+path_image,
             contentDescription = "Select a breed",
+            loading = {
+                CircularProgressIndicator(color = Color.Blue)
+            },
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
@@ -253,7 +253,7 @@ fun DrawImageCat(competitionViewModel: CompetitionViewModel){
 }
 
 @Composable
-fun CatTest(competitionViewModel: CompetitionViewModel, mediaPlayerClient: MediaPlayerClient){
+fun CompetitionTest(competitionViewModel: CompetitionViewModel, mediaPlayerClient: MediaPlayerClient){
     val context=LocalContext.current
     //val mediaPlayerClient by remember{ mutableStateOf(MediaPlayerClient(context))}
     DisposableEffect(Unit) {
@@ -266,29 +266,31 @@ fun CatTest(competitionViewModel: CompetitionViewModel, mediaPlayerClient: Media
     }
     val correctAnswer=competitionViewModel.state.correctAnswer
     when(competitionViewModel.state.listSelected){
-         0->fillTestCat(competitionViewModel,correctAnswer,mediaPlayerClient)
-         1->fillTestDog(competitionViewModel,correctAnswer,mediaPlayerClient)
-         2->fillTestFish(competitionViewModel,correctAnswer,mediaPlayerClient)
+         0->FillTestCat(competitionViewModel,correctAnswer,mediaPlayerClient)
+         1->FillTestDog(competitionViewModel,correctAnswer,mediaPlayerClient)
+         2->FillTestFish(competitionViewModel,correctAnswer,mediaPlayerClient)
     }
 }
 
 @Composable
-fun fillTestCat(competitionViewModel:CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
+fun FillTestCat(competitionViewModel:CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
     for (i in 0..<competitionViewModel.state.listRandomCats.size) {
         Spacer(modifier = Modifier.size(10.dp))
         TextButton(
             modifier=Modifier.fillMaxWidth(),
             onClick = {
-                competitionViewModel.checkCorrectAnswer(i)
-                if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
-                else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
-                competitionViewModel.clickPressed=true
-                competitionViewModel.get3Ramdom()
+                if(!competitionViewModel.clickPressed) {
+                    competitionViewModel.checkCorrectAnswer(i)
+                    if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
+                    else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
+                    competitionViewModel.clickPressed = true
+                    competitionViewModel.get3Ramdom()
+                }
             }
         ){
             val breedCat=competitionViewModel.state.listRandomCats[i]?.breed_id
             val breedCatName=CatRepository.getBreedCatNameByIdCat(breedCat)
-            var text=(i+1).toString()+")  "+ breedCatName+"."
+            val text=(i+1).toString()+")  "+ breedCatName+"."
             if(competitionViewModel.clickPressed){
                 Text(
                     text = text,
@@ -317,7 +319,7 @@ fun fillTestCat(competitionViewModel:CompetitionViewModel, correctAnswer:Int, me
 }
 
 @Composable
-fun fillTestDog(competitionViewModel: CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
+fun FillTestDog(competitionViewModel: CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
     for (i in 0..<competitionViewModel.state.listRandomDogs.size) {
         Spacer(modifier = Modifier.size(10.dp))
         TextButton(
@@ -360,7 +362,7 @@ fun fillTestDog(competitionViewModel: CompetitionViewModel, correctAnswer:Int, m
 }
 
 @Composable
-fun fillTestFish(competitionViewModel: CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
+fun FillTestFish(competitionViewModel: CompetitionViewModel, correctAnswer:Int, mediaPlayerClient: MediaPlayerClient){
     for (i in 0..<competitionViewModel.state.listRandomFish.size) {
         Spacer(modifier = Modifier.size(10.dp))
         TextButton(

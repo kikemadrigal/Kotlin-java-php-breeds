@@ -2,8 +2,6 @@ package es.tipolisto.breeds.ui.views.screens.cats
 
 
 
-import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -22,8 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,7 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.isLiveLiteralsEnabled
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,12 +54,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import es.tipolisto.breeds.R
-import es.tipolisto.breeds.data.database.records.RecordEntity
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.repositories.CatRepository
-import es.tipolisto.breeds.data.repositories.RecordsRepository
 import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
 import es.tipolisto.breeds.ui.components.onBackPressed
@@ -71,7 +68,7 @@ import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.AudioEffectsType
 import es.tipolisto.breeds.utils.Constants
 import es.tipolisto.breeds.utils.MediaPlayerClient
-import es.tipolisto.breeds.utils.Util
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,8 +85,13 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
     }
     //Conrol del botón atrás
     BackHandler{
-        catsViewModel.initGame()
-        onBackPressed(navController,context)
+        onBackPressed(
+            {
+                catsViewModel.initGame()
+            }
+            ,navController,
+            context
+        )
     }
 
     val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
@@ -107,11 +109,16 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
                     navigationIcon={
                         IconButton(
                             onClick = {
-                                catsViewModel.initGame()
-                                onBackPressed(navController,context)
+                                onBackPressed(
+                                    {
+                                        catsViewModel.initGame()
+                                    },
+                                    navController,
+                                    context
+                                )
                             }
                         ){
-                            Icon(imageVector = Icons.Default.ArrowBack,contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back")
                         }
                     },
                     actions = {
@@ -129,13 +136,11 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
                 )
             }
         ){
+            if(catsViewModel.getAllBreedsCats().isEmpty())
+                navController.navigate(AppScreens.SplashScreen.route)
             GameCatScreenContent(it,catsViewModel,recordsViewModel, navController,mediaPlayerClient)
         }
     }
-}
-
-fun checkNewRecord(context:Context) {
-    Toast.makeText(context, "Nuevo record!!",Toast.LENGTH_LONG).show()
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -150,6 +155,7 @@ fun GameCatScreen() {
 fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewModel, recordsViewModel: RecordsViewModel, navController: NavController, mediaPlayerClient: MediaPlayerClient){
     var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
     val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
+    val context= LocalContext.current
 
 
     Column (
@@ -159,10 +165,6 @@ fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewMod
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        if(catsViewModel.stateIsloading){
-            MyCircularProgressIndicator(isDisplayed = true)
-        }else
-            MyCircularProgressIndicator(isDisplayed = false)
         if(catsViewModel.gameOver) {
             recordsViewModel.checkRecord(catsViewModel.state.score)
             //Obtenemos el record que hay encima
@@ -174,10 +176,14 @@ fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewMod
                     },
                     {
                         name->
-                        recordsViewModel.insertNewRecord(name,catsViewModel.state.score, "cat")
-                        catsViewModel.initGame()
-                        navController.popBackStack()
-                        navController.navigate(AppScreens.MenuScreen.route)
+                        if(name.length>30) Toast.makeText(context,"The name must have less than 30 characters",Toast.LENGTH_LONG).show()
+                        else if(name.length<3) Toast.makeText(context,"Name too short",Toast.LENGTH_LONG).show()
+                        else {
+                            recordsViewModel.insertNewRecord(name, catsViewModel.state.score, "cat")
+                            catsViewModel.initGame()
+                            navController.popBackStack()
+                            navController.navigate(AppScreens.MenuScreen.route)
+                        }
                     }
                 )
             }else{
@@ -186,11 +192,13 @@ fun GameCatScreenContent(paddingsValues:PaddingValues, catsViewModel:CatsViewMod
                 navController.navigate(AppScreens.MenuScreen.route)
             }
         }else{
-            //catsViewModel.initGame()
             Hud(catsViewModel)
             //Pintamos la imagen del gato activo
             DrawImageCat(catsViewModel)
-            //Pondreos el resultado a verdadero o falso
+            if(catsViewModel.stateIsloading){
+                MyCircularProgressIndicator(isDisplayed = true)
+            }else
+                MyCircularProgressIndicator(isDisplayed = false)
             CatTest(catsViewModel, mediaPlayerClient)
         }
     }
@@ -236,15 +244,19 @@ fun DrawImageCat(catsViewModel: CatsViewModel){
                 .height(250.dp)
         )
     }else{
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+cat.path_image,
             contentDescription = "Select a breed",
+            loading = {
+                CircularProgressIndicator(color = Color.Blue)
+            },
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
             contentScale = ContentScale.Fit
+
         )
-        catsViewModel.stateIsloading=false
+
     }
 }
 
@@ -267,11 +279,13 @@ fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
         TextButton(
             modifier=Modifier.fillMaxWidth(),
             onClick = {
-                catsViewModel.checkCorrectAnswer(i)
-                if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
-                else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
-                catsViewModel.clickPressed=true
-                catsViewModel.get3RamdomCats()
+                if(!catsViewModel.clickPressed){
+                    catsViewModel.checkCorrectAnswer(i)
+                    if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
+                    else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
+                    catsViewModel.clickPressed=true
+                    catsViewModel.get3RamdomCats()
+                }
             }
         ){
             val breedCat=catsViewModel.state.listRandomCats[i]?.breed_id

@@ -1,6 +1,6 @@
 package es.tipolisto.breeds.ui.views.screens.dogs
 
-import android.util.Log
+
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -19,14 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,24 +46,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import es.tipolisto.breeds.R
-import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.preferences.PreferenceManager
-import es.tipolisto.breeds.data.repositories.CatRepository
 import es.tipolisto.breeds.data.repositories.DogRepository
 import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
 import es.tipolisto.breeds.ui.components.onBackPressed
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
-import es.tipolisto.breeds.ui.viewModels.CatsViewModel
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
 import es.tipolisto.breeds.ui.viewModels.RecordsViewModel
 import es.tipolisto.breeds.utils.AudioEffectsType
@@ -84,8 +79,8 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, re
     }
     //Conrol del botón atrás
     BackHandler {
-        dogsViewModel.initGame()
-        onBackPressed(navController, context)
+
+        onBackPressed({dogsViewModel.initGame()},navController, context)
     }
 
     val isDarkMode by remember { mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context)) }
@@ -104,10 +99,10 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, re
                         IconButton(
                             onClick = {
                                 dogsViewModel.initGame()
-                                onBackPressed(navController,context)
+                                onBackPressed({dogsViewModel.initGame()},navController,context)
                             }
                         ) {
-                            Icon(imageVector = Icons.Default.ArrowBack,contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back")
                         }
 
                     },
@@ -126,6 +121,8 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, re
                 )
             }
         ) {
+            if(dogsViewModel.getAllBreedsDogs().isEmpty())
+                navController.navigate(AppScreens.SplashScreen.route)
             GameDogScreenContent(it, dogsViewModel, recordsViewModel, navController, mediaPlayerClient)
         }
     }
@@ -143,8 +140,9 @@ fun GameDogScreen() {
 fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewModel,recordsViewModel: RecordsViewModel,navController: NavController, mediaPlayerClient: MediaPlayerClient){
     var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
     val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
-
-
+    val context=LocalContext.current
+    if(dogsViewModel.getAllBreedsDogs().isEmpty())
+        navController.navigate(AppScreens.SplashScreen.route)
     Column (
         modifier = Modifier
             .fillMaxHeight()
@@ -152,10 +150,7 @@ fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewMod
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        if(dogsViewModel.stateIsLoading){
-            MyCircularProgressIndicator(isDisplayed = true)
-        }else
-            MyCircularProgressIndicator(isDisplayed = false)
+
         if(dogsViewModel.gameOver) {
             recordsViewModel.checkRecord(dogsViewModel.state.score)
             if(stateNewRecord) {
@@ -165,10 +160,14 @@ fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewMod
                         showNewRecordDialog = false
                     },
                     { name->
-                        recordsViewModel.insertNewRecord(name,dogsViewModel.state.score, "dog")
-                        dogsViewModel.initGame()
-                        navController.popBackStack()
-                        navController.navigate(AppScreens.MenuScreen.route)
+                        if(name.length>30) Toast.makeText(context,"The name must have less than 30 characters",Toast.LENGTH_LONG).show()
+                        else if(name.length<3) Toast.makeText(context,"Name too short",Toast.LENGTH_LONG).show()
+                        else {
+                            recordsViewModel.insertNewRecord(name, dogsViewModel.state.score, "dog")
+                            dogsViewModel.initGame()
+                            navController.popBackStack()
+                            navController.navigate(AppScreens.MenuScreen.route)
+                        }
                     }
                 )
             }else {
@@ -179,6 +178,10 @@ fun GameDogScreenContent(paddingsValues:PaddingValues, dogsViewModel:DogsViewMod
         }else{
             DogHud(dogsViewModel)
             DrawImageDog(dogsViewModel)
+            if(dogsViewModel.stateIsLoading){
+                MyCircularProgressIndicator(isDisplayed = true)
+            }else
+                MyCircularProgressIndicator(isDisplayed = false)
             DogTests(dogsViewModel, mediaPlayerClient)
         }
     }
@@ -220,9 +223,12 @@ fun DrawImageDog(dogsViewModel: DogsViewModel){
         )
     }else{
         //dogsViewModel.stateIsLoading=true
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+dog.path_image,
             contentDescription = "Select a breed",
+            loading = {
+                CircularProgressIndicator(color = Color.Blue)
+            },
             modifier = Modifier
                 .size(400.dp, 300.dp)
                 .padding(top = 20.dp),
@@ -251,12 +257,13 @@ fun DogTests(dogsViewModel: DogsViewModel, mediaPlayerClient:MediaPlayerClient){
         TextButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                dogsViewModel.checkCorrectAnswer(i)
-
-                if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
-                else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
-                dogsViewModel.clickPressed=true
-                dogsViewModel.get3RamdomDogs()
+                if(!dogsViewModel.clickPressed) {
+                    dogsViewModel.checkCorrectAnswer(i)
+                    if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
+                    else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
+                    dogsViewModel.clickPressed = true
+                    dogsViewModel.get3RamdomDogs()
+                }
             }
         ) {
             val breedDog=dogsViewModel.state.listRandomDogs[i]?.breed_id

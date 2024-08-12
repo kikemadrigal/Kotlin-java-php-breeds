@@ -33,8 +33,36 @@ class FileGameRepository {
 		$basededatos->desconectar();
 		return $path;
 	}
- 
-
+	public static function getRanking($init){
+		$fishs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM fish ORDER BY total_points DESC LIMIT ".$init.", 10";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$fish=self::asignarElementos($linea);
+			$fishs[]=$fish;
+		}
+		$basededatos->desconectar();
+		return $fishs;
+	}
+	public static function getMax3Beauties(){
+		$fishs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT MAX(total_points) FROM fish ORDER BY total_points DESC LIMIT 3";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$fish=self::asignarElementos($linea);
+			$fishs[]=$fish;
+		}
+		$basededatos->desconectar();
+		return $fishs;
+	}
 	public static function insert($game){
 		$bd= new MysqliClient();
 		$bd->conectar_mysql();
@@ -45,6 +73,22 @@ class FileGameRepository {
 		$bd->desconectar();
 	}
 
+
+	public static function updateBeauty($id_fish, $new_points){
+		$fish=self::getById($id_fish);
+		$total_points=$fish->get_total_points();
+		$total_points++;
+		$points=$new_points/$total_points;	
+		$bd= new MysqliClient();
+        $bd->conectar_mysql();
+		$sql="update fish set points='"
+		.$points
+		."', total_points='"
+		.$total_points
+		."' WHERE id='".$id_fish."'";
+		$bd->ejecutar_sql($sql);
+        $bd->desconectar();
+	}
 	public static function delete($id){
         $bd= new MysqliClient();
         $bd->conectar_mysql();

@@ -17,14 +17,14 @@ include_once("./views/templates/document-start.php");
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <a href="<?php echo PATHSERVER; ?>BreedCat/delete/<?php echo $cat->get_id(); ?>" class="btn btn-primary">   SI   </a>
+                <a href="<?php echo PATHSERVER; ?>Cat/delete/<?php echo $cat->get_id(); ?>" class="btn btn-primary">   SI   </a>
             </div>
         </div>
     </div>
 </div>
 
 
-<h3>Update Breed cat </h3>
+<h3>Update Cat </h3>
 
 <!----------------------------------------------------------------------------------------------------------------------->
 <!------------------------------------------------ FORMULARIO ACTUALIZAR------------------------------------------------->
@@ -99,6 +99,12 @@ include_once("./views/templates/document-start.php");
         </div>
     </div> 
     <div class='form-group m-4' >  
+        <label for='validate' class='control-label '>validate: </label> 
+        <div class='col'>
+            <input type='text' class='form-control' name='validate' id='validate' title='validate' value='<?php echo $cat->get_validate(); ?>'  />
+        </div>
+    </div> 
+    <div class='form-group m-4' >  
         <label for='creator_id' class='control-label '>creator_id:</label> 
         <div class='col'>
             <input type='number' class='form-control' name='creator_id' id='creator_id' title='creator_id' value='<?php echo $cat->get_creator_id(); ?>' />
@@ -111,8 +117,9 @@ include_once("./views/templates/document-start.php");
         <div class='col col-md-offset-2' >
             <input type="hidden" name="id" id="id" value='<?php echo $cat->get_id() ?>' />
             <input type='submit' name="submit" id="submit" value='Update' class='btn btn-primary' ></input> 
-            <!--<input type='button' name="remove" id="remove" value='Remove' class='btn btn-danger' data-toggle="modal" data-target="#deleteModal" ></input> -->
-            <a href="<?php echo PATHSERVER; ?>BreedCat/delete/<?php echo $cat->get_id(); ?>" class="btn btn-danger">   Delete   </a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Delete
+            </button>
         </div>
     </div> 
 </form>

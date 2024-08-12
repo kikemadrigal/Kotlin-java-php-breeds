@@ -36,7 +36,7 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 Report all PHP errors
 error_reporting(E_ALL);
 */
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
 //error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -50,6 +50,8 @@ require_once("./views/View.php");
 
 require_once('./app/util/Util.php');
 require_once('./app/util/StringManager.php');
+
+require_once('./app/util/Email.php');
 //require_once('./app/util/FilesManager.php');
 //include_once("./app/util/RegisterValidator.php");
 

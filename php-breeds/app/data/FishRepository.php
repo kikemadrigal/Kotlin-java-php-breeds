@@ -12,7 +12,10 @@ class FishRepository{
 		$fish->set_name($linea['name']);
 		$fish->set_name_es($linea['name_es']);
 		$fish->set_specie_id($linea['specie_id']);
+		$fish->set_points($linea['points']);
+		$fish->set_total_points($linea['total_points']);
 		$fish->set_path_image($linea['path_image']);
+		$fish->set_validate($linea['validate']);
 		$fish->set_date($linea['date']);
 		$fish->set_creator_id($linea['creator_id']);
 		return $fish;
@@ -87,6 +90,36 @@ class FishRepository{
 		$basededatos->desconectar();
 	}
 
+	public static function getRanking($init){
+		$fishs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM fish ORDER BY total_points DESC LIMIT ".$init.", 10";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$fish=self::asignarElementos($linea);
+			$fishs[]=$fish;
+		}
+		$basededatos->desconectar();
+		return $fishs;
+	}
+	public static function getMax3Beauties(){
+		$fishs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM fish ORDER BY total_points DESC LIMIT 3";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$fish=self::asignarElementos($linea);
+			$fishs[]=$fish;
+		}
+		$basededatos->desconectar();
+		return $fishs;
+	}
 
 	public static function getRandom(){
 		$fish=null;
@@ -136,13 +169,27 @@ class FishRepository{
 		$basededatos->desconectar();
 		return $rowCount;
 	}
-	
-
-	public static function getAllByUser($idUser, $start, $end){
+	public static function getLastFive(){
 		$fishs=array();
 		$basededatos= new MysqliClient();
 		$basededatos->conectar_mysql();
-		$consulta  = "SELECT * FROM fish WHERE creator_id='".$idUser."' limit ".$start .", ".$end."";
+		$consulta  = "SELECT * FROM fish ORDER BY id DESC LIMIT 5";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$fish=self::asignarElementos($linea);
+			$fishs[]=$fish;
+		}
+		$basededatos->desconectar();
+		return $fishs;
+	}
+	
+
+	public static function getAllByUser($idUser, $init){
+		$fishs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM fish WHERE creator_id='".$idUser."' LIMIT ".$init.", 10";
 		$resultado=$basededatos->ejecutar_sql($consulta);
 		while ($linea = mysqli_fetch_array($resultado)) 
 		{
@@ -169,7 +216,10 @@ class FishRepository{
 			.$fish->get_name()."', '"
 			.$fish->get_name_es()."', '"
 			.$fish->get_specie_id()."', '"
+			.$fish->get_points()."', '"
+			.$fish->get_total_points()."', '"
 			.$fish->get_path_image()."', '"
+			.$fish->get_validate()."', '"
 			.$fish->get_date()."', '"
 			.$fish->get_creator_id()."', '"
 			."') ";		
@@ -190,10 +240,16 @@ class FishRepository{
 			.$fish->get_name()
 			."', name_es='"
 			.$fish->get_name_es()
-			."', breed_id='"
+			."', specie_id='"
 			.$fish->get_specie_id()
+			."', points='"
+			.$fish->get_points()
+			."', total_points='"
+			.$fish->get_total_points()
 			."', path_image='"
 			.$fish->get_path_image()
+			."', validate='"
+			.$fish->get_validate()
 			."', date='"
 			.$fish->get_date()
 			."', creator_id='"
@@ -201,7 +257,23 @@ class FishRepository{
 			."' WHERE id='".$fish->get_id()."'";
         $bd->ejecutar_sql($sql);
         $bd->desconectar();
-    }
+    } 
+
+	public static function updateBeauty($id_fish, $new_points){
+		$fish=self::getById($id_fish);
+		$total_points=$fish->get_total_points();
+		$total_points++;
+		$points=$new_points/$total_points;	
+		$bd= new MysqliClient();
+        $bd->conectar_mysql();
+		$sql="update fish set points='"
+		.$points
+		."', total_points='"
+		.$total_points
+		."' WHERE id='".$id_fish."'";
+		$bd->ejecutar_sql($sql);
+        $bd->desconectar();
+	}
 
 	public static function delete($id){
         $bd= new MysqliClient();

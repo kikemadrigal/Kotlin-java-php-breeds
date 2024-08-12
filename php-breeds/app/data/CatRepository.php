@@ -19,7 +19,12 @@ class CatRepository{
 		$cat->set_sex($linea['sex']);
 		$cat->set_address($linea['address']);
 		$cat->set_vaccines($linea['vaccines']);
+		$cat->set_points($linea['points']);
+		$cat->set_total_points($linea['total_points']);
+		$cat->set_points($linea['points']);
+		$cat->set_total_points($linea['total_points']);
 		$cat->set_path_image($linea['path_image']);
+		$cat->set_validate($linea['validate']);
 		$cat->set_date($linea['date']);
 		$cat->set_creator_id($linea['creator_id']);
 		return $cat;
@@ -42,17 +47,6 @@ class CatRepository{
 		return $cat;
 	}
 
-	public static function getAuthorById($id){
-		$basededatos= new MysqliClient();
-		$basededatos->conectar_mysql();
-		$consulta  = "SELECT author FROM games WHERE id='$id' ";
-		$resultado=$basededatos->ejecutar_sql($consulta);
-		while ($linea = mysqli_fetch_array($resultado)) 
-		{
-			return $linea['author'];
-		}
-		$basededatos->desconectar();
-	}
 
 
 	public static function getRandom(){
@@ -90,6 +84,36 @@ class CatRepository{
 		$basededatos->desconectar();
 		return $cats;
 	}
+	public static function getRanking($init){
+		$cats=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM cat ORDER BY total_points DESC LIMIT ".$init.", 10";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$cat=self::asignarElementos($linea);
+			$cats[]=$cat;
+		}
+		$basededatos->desconectar();
+		return $cats;
+	}
+	public static function getMax3Beauties(){
+		$cats=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM cat ORDER BY total_points DESC LIMIT 3";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$cat=self::asignarElementos($linea);
+			$cats[]=$cat;
+		}
+		$basededatos->desconectar();
+		return $cats;
+	}
 	public static function getCountRows(){
 		$rowCount=0;
 		$basededatos= new MysqliClient();
@@ -105,11 +129,11 @@ class CatRepository{
 	}
 	
 
-	public static function getAllByUser($idUser, $start, $end){
+	public static function getAllByUser($idUser,$init){
 		$cats=array();
 		$basededatos= new MysqliClient();
 		$basededatos->conectar_mysql();
-		$consulta  = "SELECT * FROM cat WHERE creator_id='".$idUser."' limit ".$start .", ".$end."";
+		$consulta  = "SELECT * FROM cat WHERE creator_id='".$idUser."' LIMIT ".$init .", 10";
 		$resultado=$basededatos->ejecutar_sql($consulta);
 		while ($linea = mysqli_fetch_array($resultado)) 
 		{
@@ -119,6 +143,11 @@ class CatRepository{
 		$basededatos->desconectar();
 		return $cats;
 	}
+
+
+
+
+
 	public static function getByName($name){
 		$cats=array();
 		$breedCat=null;
@@ -130,6 +159,20 @@ class CatRepository{
 		{
 			$breedCat=self::asignarElementos($linea);
 			$cats[]=$breedCat;
+		}
+		$basededatos->desconectar();
+		return $cats;
+	}
+	public static function getLastFive(){
+		$cats=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM cat ORDER BY id DESC LIMIT 5";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$cat=self::asignarElementos($linea);
+			$cats[]=$cat;
 		}
 		$basededatos->desconectar();
 		return $cats;
@@ -158,7 +201,10 @@ class CatRepository{
 			.$cat->get_sex()."', '"
 			.$cat->get_address()."', '"
 			.$cat->get_vaccines()."', '"
+			.$cat->get_points()."', '"
+			.$cat->get_total_points()."', '"
 			.$cat->get_path_image()."', '"
+			.$cat->get_validate()."', '"
 			.$cat->get_date()."', '"
 			.$cat->get_creator_id()."', '"
 			."') ";		
@@ -195,8 +241,14 @@ class CatRepository{
 			.$cat->get_address()
 			."', vaccines='"
 			.$cat->get_vaccines()
+			."', points='"
+			.$cat->get_points()
+			."', total_points='"
+			.$cat->get_total_points()
 			."', path_image='"
 			.$cat->get_path_image()
+			."', validate='"
+			.$cat->get_validate()
 			."', date='"
 			.$cat->get_date()
 			."', creator_id='"
@@ -205,7 +257,22 @@ class CatRepository{
         $bd->ejecutar_sql($sql);
         $bd->desconectar();
     }
-
+	
+	public static function updateBeauty($id_cat, $new_points){
+		$cat=self::getById($id_cat);
+		$total_points=$cat->get_total_points();
+		$total_points++;
+		$points=$new_points/$total_points;	
+		$bd= new MysqliClient();
+        $bd->conectar_mysql();
+		$sql="update cat set points='"
+		.$points
+		."', total_points='"
+		.$total_points
+		."' WHERE id='".$id_cat."'";
+		$bd->ejecutar_sql($sql);
+        $bd->desconectar();
+	}
 	public static function delete($id){
         $bd= new MysqliClient();
         $bd->conectar_mysql();

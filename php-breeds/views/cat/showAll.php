@@ -10,42 +10,8 @@ if($this->cats==NULL) {
 	die();
 }
 else{
-//echo "page= ".$page;
+
 ?>
-
-
-
-<div class="m-4">
-	<a href="<?php echo PATHSERVER;?>Cat/search/number" class="btn btn-secondary">0-9</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/a" class="btn btn-secondary">A</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/b" class="btn btn-secondary">B</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/c" class="btn btn-secondary">C</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/d" class="btn btn-secondary">D</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/e" class="btn btn-secondary">E</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/f" class="btn btn-secondary">F</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/g" class="btn btn-secondary">G</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/h" class="btn btn-secondary">H</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/i" class="btn btn-secondary">I</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/j" class="btn btn-secondary">J</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/k" class="btn btn-secondary">K</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/l" class="btn btn-secondary">L</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/m" class="btn btn-secondary">M</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/n" class="btn btn-secondary">N</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/ñ" class="btn btn-secondary">Ñ</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/o" class="btn btn-secondary">O</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/p" class="btn btn-secondary">P</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/q" class="btn btn-secondary">Q</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/r" class="btn btn-secondary">R</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/s" class="btn btn-secondary">S</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/t" class="btn btn-secondary">T</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/u" class="btn btn-secondary">U</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/v" class="btn btn-secondary">V</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/w" class="btn btn-secondary">W</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/x" class="btn btn-secondary">X</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/y" class="btn btn-secondary">Y</a>
-	<a href="<?php echo PATHSERVER;?>Cat/search/z" class="btn btn-secondary">Z</a>
-</div>
-
 
 
 
@@ -93,6 +59,8 @@ else{
 		<th scope="col">sex</th>
 		<th scope="col">address</th>
 		<th scope="col">vaccines</th>
+		<th scope="col">Points</th>
+		<th scope="col">Total points</th>
 		<th scope="col">Path_image</th>
 		<th scope="col">Date</th>
 		<th scope="col">Creator_id</th>
@@ -127,6 +95,8 @@ else{
 							echo "<td>".$sexo."</td>";
 							echo "<td>".$cat->get_address()."</td>";
 							echo "<td>".$cat->get_vaccines()."</td>";
+							echo "<td>".$cat->get_points()."</td>";
+							echo "<td>".$cat->get_total_points()."</td>";
 							echo "<td>".$cat->get_path_image()."</td>";
 							echo "<td>".$cat->get_date()."</td>";
 							echo "<td>".$cat->get_creator_id()."</td>";

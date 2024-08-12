@@ -12,7 +12,10 @@ Class Dog {
 	private $sex;
 	private $address;
 	private $vaccines;
+	private $points;
+	private $total_points;
 	private $path_image;
+	private $validate;
 	private $date;
 	private $creator_id;
 	
@@ -57,8 +60,17 @@ Class Dog {
 	function set_vaccines($vaccines){
 		$this->vaccines=$vaccines;
 	}
+	function set_points($points){
+		$this->points=$points;
+	}
+	function set_total_points($total_points){
+		$this->total_points=$total_points;
+	}
 	function set_path_image($path_image){
 		$this->path_image=$path_image;
+	}
+	function set_validate($validate){
+		$this->validate=$validate;
 	}
     function set_date($date){
 		$this->date=$date;
@@ -102,8 +114,17 @@ Class Dog {
 	function get_vaccines(){
 		return $this->vaccines;
 	}
+	function get_points(){
+		return $this->points;
+	}
+	function get_total_points(){
+		return $this->total_points;
+	}
 	function get_path_image(){
 		return $this->path_image;
+	}
+	function get_validate(){
+		return $this->validate;
 	}
     function get_date(){
 		return $this->date;

@@ -5,8 +5,8 @@ import android.widget.Toast
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,6 +45,7 @@ import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.database.favorites.FavoritesEntity
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 
@@ -54,7 +54,7 @@ import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 @Composable
 fun FavoritesScreen(navController: NavController, favoritesViewModel: FavoritesViewModel){
     val context= LocalContext.current
-    var isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
+    val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
     //var checked by remember {mutableStateOf(false)}
     BreedsTheme(darkTheme = isDarkMode) {
 
@@ -70,14 +70,14 @@ fun FavoritesScreen(navController: NavController, favoritesViewModel: FavoritesV
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
                 )
             }
         ) {
             Column (modifier=Modifier.padding(it)){
-                AnimalTab(favoritesViewModel)
+                AnimalTab(favoritesViewModel, navController)
             }
 
         }//Final de scafold
@@ -88,7 +88,7 @@ fun FavoritesScreen(navController: NavController, favoritesViewModel: FavoritesV
 
 
 @Composable
-fun getAllForType( favoritesViewModel:FavoritesViewModel, animal:String){
+fun getAllForType( favoritesViewModel:FavoritesViewModel, animal:String, navController: NavController){
     val context= LocalContext.current
     var listFavorites= emptyList<FavoritesEntity>()
     when (animal){
@@ -107,7 +107,7 @@ fun getAllForType( favoritesViewModel:FavoritesViewModel, animal:String){
     ) {
         //En realidad esta función es así=items(listFavorites, onCLick(favoritesEntity){...código..})
         items(listFavorites) { item ->
-            ListIntemRow(item) {
+            ListIntemRow(navController,item) {
                 favoritesViewModel.delete(it)
                 Toast.makeText(context, "Deleting cat from favorites", Toast.LENGTH_LONG)
                     .show()
@@ -116,7 +116,7 @@ fun getAllForType( favoritesViewModel:FavoritesViewModel, animal:String){
     }
 }
 @Composable
-fun ListIntemRow(favoritesEntity: FavoritesEntity, onClick:(FavoritesEntity)->Unit){
+fun ListIntemRow(navController: NavController,favoritesEntity: FavoritesEntity, onClick:(FavoritesEntity)->Unit){
     Column {
         val model:String=favoritesEntity.image
         //val model by remember { mutableStateOf(url) }
@@ -131,21 +131,33 @@ fun ListIntemRow(favoritesEntity: FavoritesEntity, onClick:(FavoritesEntity)->Un
         ){
             Image(painter = painterResource(id = R.drawable.no_favorite), contentDescription = "Cat list")
         }
+        val context= LocalContext.current
         AsyncImage(
             model = model,
             contentDescription = "Select a breed",
             modifier = Modifier
                 .size(400.dp, 300.dp)
-                .padding(top = 10.dp),
+                .padding(top = 10.dp)
+                .clickable {
+                    if(favoritesEntity.animal=="Cat")
+                        navController.navigate(AppScreens.DetailCatScreen.route + "/${favoritesEntity.idAnimal}")
+                    else if(favoritesEntity.animal=="Dog")
+                        navController.navigate(AppScreens.DetailDogScreen.route + "/${favoritesEntity.idAnimal}")
+                    else if (favoritesEntity.animal=="Fish")
+                        navController.navigate(AppScreens.DetailFishScreen.route + "/${favoritesEntity.idAnimal}")
+
+                },
             contentScale = ContentScale.Fit
         )
         Text(text = favoritesEntity.nameBreed, style = MaterialTheme.typography.headlineLarge )
-        Text(text = favoritesEntity.description, style = MaterialTheme.typography.bodyLarge )
+        var description=favoritesEntity.description
+        if(description.length>100) description=description.substring(0,100)+"..."
+        Text(text = description, style = MaterialTheme.typography.bodyLarge )
     }
 }
 
 @Composable
-fun AnimalTab(favoritesViewModel: FavoritesViewModel){
+fun AnimalTab(favoritesViewModel: FavoritesViewModel, navController: NavController){
     var tabIndex by remember { mutableStateOf(0) }
     val lista= listOf(stringResource(R.string.all),stringResource(R.string.cats), stringResource(R.string.dogs), stringResource(R.string.fish))
     Column (modifier= Modifier.fillMaxWidth()){
@@ -158,10 +170,10 @@ fun AnimalTab(favoritesViewModel: FavoritesViewModel){
             }
         }
         when (tabIndex) {
-            0 -> getAllForType(favoritesViewModel,"All")
-            1 -> getAllForType(favoritesViewModel,"Cats")
-            2 -> getAllForType(favoritesViewModel,"Dogs")
-            3 -> getAllForType(favoritesViewModel, "Fish")
+            0 -> getAllForType(favoritesViewModel,"All", navController)
+            1 -> getAllForType(favoritesViewModel,"Cats", navController)
+            2 -> getAllForType(favoritesViewModel,"Dogs", navController)
+            3 -> getAllForType(favoritesViewModel, "Fish", navController)
         }
     }
 }

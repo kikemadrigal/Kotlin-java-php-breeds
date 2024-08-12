@@ -42,7 +42,17 @@ class FishController extends BaseController{
         $this->view->rowCount=$rowCount;
         $this->view->render("fish/showAll");
     }
-
+    public function showRanking($param=null){
+        $rowCount=FishRepository::getCountRows();
+        $page=$param[0];
+        $init=$page*10;
+        $page+=1;
+        $fishs=FishRepository::getRanking($init);
+        $this->view->fishs=$fishs;
+        $this->view->page=$page;
+        $this->view->rowCount=$rowCount;
+        $this->view->render("fish/showRanking");
+    }
 
     public function showUser($param = null){
         $this->view->param=$param;
@@ -74,8 +84,11 @@ class FishController extends BaseController{
             $fish=new Fish($_POST['id']);
             $fish->set_name($_POST['name']);
             $fish->set_name_es($_POST['name_es']);
-            $fish->set_breed_id($_POST['breed_id']);
+            $fish->set_specie_id($_POST['specie_id']);
+            $fish->set_points($_POST['points']);
+            $fish->set_total_points($_POST['total_points']);
             $fish->set_path_image($_POST['path_image']);
+            $fish->set_validate($_POST['validate']);
             $fish->set_date($_POST['date']);
             $fish->set_creator_id($_POST['creator_id']);
             if ($fish!=null){
@@ -100,6 +113,13 @@ class FishController extends BaseController{
                 echo "You are not logged in";
             }
         }
+    }
+    public function updateBeauty($param=null){
+        $id_fish=$param[0];
+        $points=$param[1];
+        FishRepository::updateBeauty($id_fish, $points);
+        header("location: ".PATHSERVER."Fish/showRanking");
+        if ( PRODUCTION==1 ) echo "<script type='text/javascript'>location.href='".PATHSERVER."Fish/showRanking';</script>";    
     }
     public function delete($id=null){
         FishRepository::delete($id[0]);

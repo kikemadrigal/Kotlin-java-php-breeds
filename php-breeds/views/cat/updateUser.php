@@ -1,189 +1,124 @@
 <?php 
-
-
-
-
-
-
-//El objeto quiz es obtenido en el controlador
+$cat=$this->cat;
 include_once("./views/templates/document-start.php"); 
 ?>
 <!-- Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estas seguro que quieres borrar ? / Are you sure you want to delete?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <a href="<?php echo PATHSERVER; ?>Quiz/delete/<?php echo $idGame; ?>" class="btn btn-primary">   SI   </a>
-            </div>
-        </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <p>¿Estas seguro que quieres borrar ? / Are you sure you want to delete?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="<?php echo PATHSERVER; ?>Cat/delete/<?php echo $cat->get_id(); ?>" class="btn btn-primary">   SI   </a>
+      </div>
     </div>
+  </div>
 </div>
 
 
-<h3>Update Quiz </h3>
-<?php
-    $quiz=$this->quiz;
-    echo "<h4>".$quiz->getId()."</h4>";
-?>
-
+<h3>Update Cat </h3>
 
 <!----------------------------------------------------------------------------------------------------------------------->
 <!------------------------------------------------ FORMULARIO ACTUALIZAR------------------------------------------------->
 <!----------------------------------------------------------------------------------------------------------------------->
 <!-- Patrones: para campos con números: pattern='[0-9]{1,10000}'-->
-<form method=post action='<?php echo PATHSERVER."Quiz/update"?>' class='form-horizontal background-pink' enctype='multipart/form-data'>
-    <div class='form-group m-4' >
-        <label for='question' class='control-label col-md-2'>question:</label>
-        <div class='col'>
-            <textarea type='text' class='form-control' name='question' id='question' rows=3 cols=60 title='Enter question' ><?php echo $quiz->getQuestion();?></textarea>
-        </div>
-    </div>
-
-
-
-
-
-
-
-
-    <!--Cover -->  
-    <div class='text-center' > 
-        <div class='col'>
-            <!--Obtener foto --> 
-            <?php
-            $image=MultimediaRepository::getImage($quiz->getImage());
-
-            if($image==null){
-                if(PRODUCTION==1){
-                    echo "<img src='".PATHSERVERSININDEX."media/sinImagen.jpg' class='max-height300' /><br>";
-                }else{
-                    echo "<img src='".PATHSERVER."media/sinImagen.jpg' class='max-height300' /><br>";
-                }
-            }else{
-                if(PRODUCTION==1){
-                    echo "<img src=".PATHSERVERSININDEX.$image->getPath()." class='max-height300' /><br>";
-                }else{
-                    echo "<img src=".PATHSERVER.$image->getPath()." class='max-height300' /><br>";
-                }
-            }
-           ?>  
-            <a href='<?php echo PATHSERVER;?>Media/showAll' target='_blanck' >Management</a><br>      
-           <!--Fin de obtener foto -->         
-            <?php $images=MultimediaRepository::getAllImagesByUser($_SESSION['idusuario']);?>
-            <select class="m-4" name='image' id='image' > ";
-                <?php
-               
-                if ($image==null){
-                    echo "<option value='1' >Sin imagen</option>";
-                }else{
-                    echo "<option value='".$image->getId()."' >".$image->getName()."</option>";
-                    
-                }
-                foreach ($images as $posicion=>$image){
-                    echo "<option value='".$image->getId()."' >".$image->getName()."</option>";
-                }
-
-                ?>
-            </select>       
-        </div>
-    </div>
-    <!-- Fin cover -->  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<form method=post action='<?php echo PATHSERVER."Cat/update"?>' class='form-horizontal background-pink' enctype='multipart/form-data'>
 
     <div class='form-group m-4' >  
-        <label for='answer1' class='control-label '>answer1:</label> 
+        <label for='name' class='control-label '>Name:</label> 
         <div class='col'>
-            <input type='text' class='form-control' name='answer1' id='answer1' title='answer1' value='<?php echo $quiz->getAnswer1(); ?>' required />
+            <input type='text' class='form-control' name='name' id='name' title='name' value='<?php echo $cat->get_name(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >  
-        <label for='answer2' class='control-label '>answer2:</label> 
+        <label for='name_es' class='control-label '>Name_es:</label> 
         <div class='col'>
-            <input type='text' class='form-control' name='answer2' id='answer2' title='answer2' value='<?php echo $quiz->getAnswer2(); ?>' required />
+            <input type='text' class='form-control' name='name_es' id='name_es' title='name_es' value='<?php echo $cat->get_name_es(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >
-        <label for='answer3' class='control-label '>answer3:</label> 
+        <label for='breed_id' class='control-label '>breed_id:</label> 
         <div class='col'>
-            <input type='text' class='form-control' name='answer3' id='answer3' title='answer3' value='<?php echo $quiz->getAnswer3(); ?>' required />
+            <input type='text' class='form-control' name='breed_id' id='breed_id' title='breed_id' value='<?php echo $cat->get_breed_id(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >  
-        <label for='correctAnswer' class='control-label '>correctAnswer: </label> 
+        <label for='family' class='control-label '>family: </label> 
         <div class='col'>
-            <input type='text' class='form-control' name='correctAnswer' id='correctAnswer' title='correctAnswer' value='<?php echo $quiz->getCorrectAnswer(); ?>' required />
-        </div>
-    </div> 
-
-    <div class='form-group m-4' >  
-        <label for='level' class='control-label '>level: </label> 
-        <div class='col'>
-            <input type='number' class='form-control' name='level' id='level' title='level' value='<?php echo $quiz->getLevel(); ?>'  />
+            <input type='text' class='form-control' name='family' id='family' title='family' value='<?php echo $cat->get_family(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >  
-        <label for='theme' class='control-label '>theme:</label> 
+        <label for='description' class='control-label '>description: </label> 
         <div class='col'>
-            <input type='text' class='form-control' name='theme' id='theme' title='theme' value='<?php echo $quiz->getTheme(); ?>'  />
+            <input type='text' class='form-control' name='description' id='description' title='description' value='<?php echo $cat->get_description(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >  
-        <label for='category' class='control-label '>category:</label> 
+        <label for='description_es' class='control-label '>description_es: </label> 
         <div class='col'>
-            <input type='text' class='form-control' name='category' id='category' title='category' value='<?php echo $quiz->getCategory(); ?>'  />
-        </div>
-    </div> 
-
-    <div class='form-group m-4' >  
-        <label for='viewed' class='control-label '>viewed:</label> 
-        <div class='col'>
-            <input type='text' class='form-control' name='viewed' id='viewed' title='viewed' value='<?php echo $quiz->getViewed(); ?>'  />
+            <input type='text' class='form-control' name='description_es' id='description_es' title='description_es' value='<?php echo $cat->get_description_es(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >  
-        <label for='date' class='control-label '>date: </label> 
+        <label for='year_of_birth' class='control-label '>year_of_birth: </label> 
         <div class='col'>
-            <input type='text' class='form-control' name='date' id='date' title='date' value='<?php echo $quiz->getDate(); ?>' />
+            <input type='text' class='form-control' name='year_of_birth' id='year_of_birth' title='year_of_birth' value='<?php echo $cat->get_year_of_birth(); ?>' required />
         </div>
     </div> 
     <div class='form-group m-4' >  
-        <label for='creator' class='control-label '>control:</label> 
+        <label for='sex' class='control-label '>sex: </label> 
         <div class='col'>
-            <input type='text' class='form-control' name='creator' id='creator' title='creator' value='<?php echo $quiz->getCreator(); ?>' />
+            <input type='text' class='form-control' name='sex' id='sex' title='sex' value='<?php echo $cat->get_sex(); ?>' required />
         </div>
     </div> 
+    <div class='form-group m-4' >  
+        <label for='address' class='control-label '>address: </label> 
+        <div class='col'>
+            <input type='text' class='form-control' name='address' id='address' title='address' value='<?php echo $cat->get_address(); ?>' required />
+        </div>
+    </div> 
+    <!--<div class='form-group m-4' >  
+        <label for='vaccines' class='control-label '>vaccines: </label> 
+        <div class='col'>
+            <input type='text' class='form-control' name='vaccines' id='vaccines' title='vaccines' value='<?php echo $cat->get_vaccines(); ?>' required />
+        </div>
+    </div> -->
+    <div class='form-group m-4' >  
+        <label for='path_image' class='control-label '>path_image: </label> 
+        <div class='col'>
+            <input type='text' class='form-control' name='path_image' id='path_image' title='path_image' value='<?php echo $cat->get_path_image(); ?>'  />
+        </div>
+    </div> 
+    <!--<div class='form-group m-4' >  
+        <label for='validate' class='control-label '>validate: </label> 
+        <div class='col'>
+            <input type='text' class='form-control' name='validate' id='validate' title='validate' value='<?php echo $cat->get_validate(); ?>'  />
+        </div>
+    </div> -->
+    <!--<div class='form-group m-4' >  
+        <label for='creator_id' class='control-label '>creator_id:</label> 
+        <div class='col'>
+            <input type='number' class='form-control' name='creator_id' id='creator_id' title='creator_id' value='<?php echo $cat->get_creator_id(); ?>' />
+        </div>
+    </div> -->
     
 
 
     <div class='form-group m-4' > 
         <div class='col col-md-offset-2' >
-            <input type="hidden" name="id" id="id" value='<?php echo $quiz->getId() ?>' />
+            <input type="hidden" name="id" id="id" value='<?php echo $cat->get_id() ?>' />
             <input type='submit' name="submit" id="submit" value='Update' class='btn btn-primary' ></input> 
-            <!--<input type='button' name="remove" id="remove" value='Remove' class='btn btn-danger' data-toggle="modal" data-target="#deleteModal" ></input> -->
-            <a href="<?php echo PATHSERVER; ?>Quiz/delete/<?php echo $quiz->getId(); ?>" class="btn btn-danger">   Delete   </a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Delete
+            </button>
+            <!--<a href="<?php echo PATHSERVER; ?>Cat/delete/<?php echo $cat->get_id(); ?>" class="btn btn-danger">   Delete   </a>-->
         </div>
     </div> 
 </form>

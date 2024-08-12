@@ -11,7 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -75,7 +75,7 @@ fun DetailDogScreen(
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon( imageVector = Icons.Default.ArrowBack,contentDescription = "Back" )
+                            Icon( imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back" )
                         }
                     },
                     actions = {
@@ -83,8 +83,7 @@ fun DetailDogScreen(
                            if (breedDog != null) {
                                if (isFavorite){
                                    val list=favoritesViewModel.getFavoritesByIdAnimal(breedDog.id.toString())
-                                   if(list!=null)
-                                       favoritesViewModel.delete(list[0])
+                                   favoritesViewModel.delete(list[0])
                                    favoritesViewModel.setFavorite(false)
                                //Si no está en la lista de favoritos
                                }else{
@@ -111,8 +110,9 @@ fun DetailDogScreen(
             }
         ) {
             val breedDog = dogsViewModel.getBreedDogById(id)
+            if (breedDog == null) navController.navigate(AppScreens.ListDogsScreen.route)
             val url=breedDog?.path_image
-            var model by remember { mutableStateOf(url) }
+            val model by remember { mutableStateOf(url) }
             Card(
                 modifier = Modifier
                     .padding(it)

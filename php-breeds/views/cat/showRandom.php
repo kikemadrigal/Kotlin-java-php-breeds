@@ -19,6 +19,7 @@ $breedCat=$this->breedCat;
 					echo "<p><img src='../../".$cat->get_path_image()."' class='img-fluid'/></p>";
 				echo "</div>";
 				echo "<div class='col-md-4 col-sm-12'>";
+					echo "<a class='btn-success' href='".PATHSERVER."Cat/showRandom'>Puntuar otro</a>";
 					//echo "<p>".$cat->get_name()."</p>";
 					echo "<p><h4>Nombre: ".$cat->get_name_es()."</h4></p>";
 					if($breedCat==NULL) 
@@ -33,6 +34,21 @@ $breedCat=$this->breedCat;
 					echo "<p><b>Sexo: </b>".$sexo."</p>";
 					echo "<p><b>Dirección: </b>".$cat->get_address()."</p>";
 					//echo "<p>".$cat->get_vaccines()."</p>";
+					echo "<p><a href='".PATHSERVER."Cat/showRanking'>Mostrar ranking bellezas</a>";
+
+
+					echo "<p>Puntos: ".$cat->get_total_points()."</p>";    
+						echo "<p>Puntuar: ";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/1'> 1 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/2'> 2 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/3'> 3 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/4'> 4 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/5'> 5 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/6'> 6 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/7'> 7 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/8'> 8 </a>";
+							echo "<a href='".PATHSERVER."Cat/updateBeauty/".$cat->get_id()."/9'> 9 </a>";
+						echo "</p>";
 				echo "</div>";
 			}else{
 				echo "Not data";

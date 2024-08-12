@@ -32,7 +32,10 @@
     <string name="dog_origin">origen</string>
 
 
-    <string name="settings_description">Elige si quieres adivinar la raza del gato o del perro.\nTienes 7 vidas.\nElige configuración para cambiar las carácteristicas del juego.</string>
+    <string name="settings_description1">En el menú principal elige si quieres adivinar la raza del gato, perro o especie de pez.\nTienes 7 vidas.\nPuedes obtener más información del juego clicando en el siguiente enlace:</string>
+    <string name="settings_description2">Si pinchas en competición (los canguros peleando) podrás competir en esta tabla de récords de internet, estos récords aparecen identificados como mix la vista de récords de la app.</string>
+    <string name="settings_description3">Si pinchas en beauties puedes subir tu mascota y puntuar otras para competir en este ranking de bellezas:</string>
+
     <string name="dog_game_playing_dog_breeds">Razas de perros</string>
     <string name="fish_game_Playing_fish_species">Especies de pez</string>
     <string name="cat_list">Lista de gatos</string>
@@ -59,6 +62,22 @@
     <string name="dog_description">Descripción</string>
     <string name="dog_morphology">Morfología</string>
     <string name="Competition">Competición</string>
-    <string name="you_need_to_register">Necesitas estar registrado</string>
+    <string name="you_need_to_register">Para subir, necesitas estar registro en :</string>
+    <string name="Upload_beauty">Subir belleza</string>
+    <string name="please_wait">Por favor, espere</string>
+    <string name="no_internet_connection">Sin conexión a internet se congela el programa</string>
+    <string name="congratulations">Felicidades</string>
+    <string name="you_have_achieved_a_new_record">Has conseguido un nuevo record</string>
+    <string name="create_new_record">Crear un nuevo record</string>
+    <string name="you_must_select_a_photo">Debes seleccionar una foto</string>
+    <string name="you_must_write_the_name_of_the_animal">Debes escribir el nombre del animal</string>
+    <string name="you_must_enter_the_username_and_password">Debes de escribir el usuario y contraseña</string>
+    <string name="you_do_not_have_permissions">No tienes permisos</string>
+    <string name="you_must_select_whether_it_is_a_cat_dog_or_fish">Debes de seleccionar si es un gato, perro o pez</string>
+    <string name="you_can_see_your_animals_at">Puedes ver tus animales en:</string>
+    <string name="the_image_already_exists_in_your_account_it_has_not_been_saved">Ya existe la imagen en tu cuenta, no se ha guardado</string>
+    <string name="records_view_internet_records">Ver records de internet</string>
+    <string name="login">Iniciar sesión</string>
+
 
 </resources>

@@ -1,11 +1,8 @@
 package es.tipolisto.breeds.ui.views.screens.login
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -40,15 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
-import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
-import es.tipolisto.breeds.ui.components.MyToast
+import es.tipolisto.breeds.ui.components.MyCircularProgressIndicatorWithoutText
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.LoginViewModel
 
@@ -57,7 +53,7 @@ import es.tipolisto.breeds.ui.viewModels.LoginViewModel
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController){
     val context= LocalContext.current
-    var isDarkMode by remember { mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context)) }
+    val isDarkMode by remember { mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context)) }
     BreedsTheme(darkTheme = isDarkMode) {
         Scaffold(
             topBar = {
@@ -71,7 +67,7 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController){
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
                                 tint = Color.White
                             )
@@ -94,10 +90,12 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController){
 
 @Composable
 fun Login(loginViewModel: LoginViewModel){
-    val name: String by loginViewModel.name.observeAsState(initial = "")
+    //val context= LocalContext.current
+    val name: String by loginViewModel.name.observeAsState(initial ="")
     val password: String by loginViewModel.password.observeAsState(initial = "")
     val loginEnable: Boolean by loginViewModel.loginEnable.observeAsState(initial = false)
-    //val message: String by loginViewModel.messageLiveData.observeAsState(initial = "")
+    //var user by remember { mutableStateOf(PreferenceManager.readPreferenceUser(context)) }
+
 
     val recordMix=loginViewModel.getRecordMix()
     Column (modifier=Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally){
@@ -109,10 +107,12 @@ fun Login(loginViewModel: LoginViewModel){
         Spacer(modifier = Modifier.padding(4.dp))
         //ForgotPassword()
         TextField(value =recordMix.toString() , onValueChange ={}, modifier=Modifier.fillMaxWidth(), enabled = false)
+        if(loginViewModel.dialogState) MyCircularProgressIndicatorWithoutText(isDisplayed = true)
+        else MyCircularProgressIndicatorWithoutText(isDisplayed = false)
         Spacer(modifier = Modifier.padding(16.dp))
         LoginButton(loginEnable){
             if(recordMix>100)
-                loginViewModel.saveScore(context,name, password, recordMix)
+                loginViewModel.saveScore(context,name, password, recordMix, loginViewModel)
             else
                 Toast.makeText(context,"La puntuación tiene que ser mayor de 100", Toast.LENGTH_LONG).show()
         }
@@ -135,27 +135,38 @@ fun LoginButton(loginEnabled:Boolean, saveScore:()->Unit) {
         colors = ButtonDefaults.buttonColors(),
         enabled = loginEnabled
     ) {
-        Text(text = "Iniciar sesion")
+        Text(text = stringResource(R.string.login))
     }
 }
 @Composable
-fun NameField(email:String, onTextFielChange:(String)->Unit){
+fun NameField( name:String, onTextFielChange:(String)->Unit){
+    //val context= LocalContext.current
     TextField(
-        value = email,
-        onValueChange ={onTextFielChange(it)},
+        value = name,
+        onValueChange ={
+            onTextFielChange(it)
+            //user.name=it
+            //PreferenceManager.savePreferenceUser(context,user)
+                       },
         modifier=Modifier.fillMaxWidth(),
         placeholder = { Text(text="name") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
     )
 }
 @Composable
 fun PasswordField(password:String, onTextFielChange: (String) -> Unit){
+    //val context= LocalContext.current
     TextField(
         value = password,
-        onValueChange = {onTextFielChange(it)},
+        onValueChange = {
+            onTextFielChange(it)
+            //user.password=it
+            //PreferenceManager.savePreferenceUser(context, user)
+                        },
         placeholder = { Text(text = "Password")},
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        visualTransformation = PasswordVisualTransformation()
     )
 }
 

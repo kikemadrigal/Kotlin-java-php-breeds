@@ -20,6 +20,7 @@ class LoginViewModel(private val recordDao: RecordDao):ViewModel() {
     val name:LiveData<String> = _name
     private val _password=MutableLiveData<String>()
     val password:LiveData<String> = _password
+    var dialogState by mutableStateOf(false)
     //private val _messageLiveData = MutableLiveData<String>()
     //val messageLiveData: LiveData<String> = _messageLiveData
     var message by mutableStateOf<String>("")
@@ -64,8 +65,9 @@ class LoginViewModel(private val recordDao: RecordDao):ViewModel() {
         return RecordsRepository.getRecordMix(recordDao)
     }
 
-    fun saveScore(context: Context, name: String, password: String, score: Int){
+    fun saveScore(context: Context, name: String, password: String, score: Int, loginViewModel: LoginViewModel){
         viewModelScope.launch {
+            loginViewModel.dialogState=true
             //_messageLiveData.value=UserRepository.saveScore(name, password, score)
             message=UserRepository.saveScore(name, password, score)
             when (message) {
@@ -77,6 +79,7 @@ class LoginViewModel(private val recordDao: RecordDao):ViewModel() {
                 "5" -> Toast.makeText( context,"Otra puntuación más alta encontrada", Toast.LENGTH_LONG).show()
                 else-> Toast.makeText( context,"Problema no encontrado", Toast.LENGTH_LONG).show()
             }
+            loginViewModel.dialogState=false
         }
     }
 }

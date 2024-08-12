@@ -116,25 +116,30 @@ class AuthController extends BaseController{
         if (isset($_POST['submit'])){
             $existeCorreo=UserRepository::comprobarSiExisteCoreoYaRegistrado($_POST['correousuario']);
             if ($existeCorreo){
-            $mensaje="Este correo ya existe.";
+                $mensaje="Este correo ya existe.";
             }else{
-                $correoUsuario=$_POST['correousuario'];
-                $usuario=$_POST['nombreusuario'];
-                $fecha=date("d/m/Y");
-                $codigoActivacion=sha1(UserRepository::generarCodigoActivacion(20,false));
-                //Tenemos que guardar la contraseña hash generada automáticamente en la base de datos, le pondremos un 0 a usuario validado
-                $bd= new MysqliClient();
-                $bd->conectar_mysql();
-                $sql="INSERT INTO users (id, name, password, role, email, realName, surname, web, validate, counter, date, view, token, observations)  VALUES ( '', '$usuario','$codigoActivacion', '3', '$correoUsuario', ' ', ' ', ' ', '0', 0, '$fecha', 2,'', 'clave generada por defecto') ";
-                //$sql="INSERT INTO users (id, name, password, role, email, realName, surname, web, validate, counter, date, observations)  VALUES ( '', 'juan','12345', '3', 'juan@hotmail.com','nombre real', 'Sin apellido', 'Sin web', '0', 0, '12/12/2022', 'clave generada por defecto') ";
-                if($bd->ejecutar_sql($sql)==null){
-                    $mensaje="Error, no se pudo crear el usuario.";
+                $existeNombre=UserRepository::comprobarSiExisteElNombreDeUsuario($_POST['nombreusuario']);
+                if ($existeNombre){
+                    $mensaje="Este nombre de usuario ya existe.";
+                }else{
+                    $correoUsuario=$_POST['correousuario'];
+                    $usuario=$_POST['nombreusuario'];
+                    $fecha=date("d/m/Y");
+                    $codigoActivacion=sha1(UserRepository::generarCodigoActivacion(20,false));
+                    //Tenemos que guardar la contraseña hash generada automáticamente en la base de datos, le pondremos un 0 a usuario validado
+                    $bd= new MysqliClient();
+                    $bd->conectar_mysql();
+                    $sql="INSERT INTO users (id, name, password, role, email, realName, surname, web, validate, counter, date, view, token, observations)  VALUES ( '', '$usuario','$codigoActivacion', '3', '$correoUsuario', ' ', ' ', ' ', '0', 0, '$fecha', 2,'', 'clave generada por defecto') ";
+                    //$sql="INSERT INTO users (id, name, password, role, email, realName, surname, web, validate, counter, date, observations)  VALUES ( '', 'juan','12345', '3', 'juan@hotmail.com','nombre real', 'Sin apellido', 'Sin web', '0', 0, '12/12/2022', 'clave generada por defecto') ";
+                    if($bd->ejecutar_sql($sql)==null){
+                        $mensaje="Error, no se pudo crear el usuario.";
+                    }
+                    $bd->desconectar();
+                    //Enviamos el mensaje
+                    $link=" Pincha en este enlace para terminar el registro en breeds.tipolisto.es, Click on this link to register at ";
+                    $link .=" ".PATHSERVER."Auth/mailValidation"."/".$usuario."/".$codigoActivacion." ";  
+                    $mensaje=$this->sendMail($link, $correoUsuario);
                 }
-                $bd->desconectar();
-                //Enviamos el mensaje
-                $link=" Pincha en este enlace para terminar el registro en quiz.tipolisto.es, Click on this link to register at ";
-                $link .=" ".PATHSERVER."Auth/mailValidation"."/".$usuario."/".$codigoActivacion." ";  
-                $mensaje=$this->sendMail($link, $correoUsuario);
             }
         }
         $this->view->message=$mensaje;
@@ -301,7 +306,7 @@ class AuthController extends BaseController{
                     $mensaje="Error, no se pudo crear el usuario.";
                 }
                 $bd->desconectar();
-                $link = "Pincha en este enlace para recuperar tu cuenta en gamesdb.tipolisto.es<br>Click on this link to recover your account at tipolisto.es";
+                $link = "Pincha en este enlace para recuperar tu cuenta en breeds.tipolisto.es<br>Click on this link to recover your account at tipolisto.es";
                 $link .= PATHSERVER."auth/mailValidation"."/".$usuario."/".$codigoActivacion." ";      
                 $mensaje=$this->sendMail($link, $correoUsuario);
             }else{
@@ -320,20 +325,14 @@ class AuthController extends BaseController{
 
     private function sendMail($link,$correoUsuario){
         $mensaje="";
-        if (PRODUCTION==1){
-            /****************************************
-                            PRODUCTION                    
-            ****************************************/ 
-            $subject = "New message from gamesdb.tipolisto.es";   
+        /*if (PRODUCTION==1){
+            $subject = "New message from breeds.tipolisto.es";   
             if (mail($correoUsuario,$subject,$link)){
                 $mensaje="Revisa el correo ".$correoUsuario." para la activación, revisa el correo no deseado.<br>Check the email ".$correoUsuario." for activation, check spam.";
             }else{
                 $mensaje= "Mensaje fallido";
             }            
-        }else{
-            /****************************************
-                            DEVELOPMENT                    
-            ****************************************/ 
+        }else{*/
             require_once "./libraries/PHPMailer/Exception.php";
             require_once "./libraries/PHPMailer/PHPMailer.php";
             require_once "./libraries/PHPMailer/SMTP.php";
@@ -341,8 +340,8 @@ class AuthController extends BaseController{
             $mail = new PHPMailer(true);
             try {
                 $mail->SMTPDebug = 0;                      //Enable verbose debug output
-                $mail->isSMTP();                                            //Send using SMTP
-                $mail->Host       = "smtp.gmail.com";                     //Set the SMTP server to send through
+                $mail->isSMTP();                                            //Send using SMTP                  //Set the SMTP server to send through
+                $mail->Host       = EMAILHOST;                     //Set the SMTP server to send through
                 $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
                 $mail->Username   = EMAILSERVER;                     //SMTP username
                 $mail->Password   = EMAILPASSWORD;                               //SMTP password
@@ -352,13 +351,13 @@ class AuthController extends BaseController{
                 $mail->setFrom(EMAILSERVER, EMAILUSER);
                 //a quien se le va a enviar
                 //$usuario=$_POST['nombreusuario'];
-                $mail->addAddress($correoUsuario, "User gamedb");    
+                $mail->addAddress($correoUsuario, $correoUsuario);    
                 $mail->isHTML(true);                                  //Set email format to HTML
-                $mail->Subject =  "New message from gamesdb.tipolisto.es";
-                //$link="<p> <a href='".PATHSERVER."auth/mailValidation"."/".$usuario."/".$codigoActivacion."'>Pincha en este enlace para recuperar tu cuenta en gamesdb.tipolisto.es<br>Click on this link to recover your account at tipolisto.es</a></p>";  
+                $mail->Subject =  "New message from breeds.tipolisto.es";
+                //$link="<p> <a href='".PATHSERVER."auth/mailValidation"."/".$usuario."/".$codigoActivacion."'>Pincha en este enlace para recuperar tu cuenta en breeds.tipolisto.es<br>Click on this link to recover your account at tipolisto.es</a></p>";  
                 $mail->Body    = "<html>  
                                     <head> 
-                                        <title>gamesdb.tipolisto.es</title>                                 
+                                        <title>breeds.tipolisto.es</title>                                 
                                     </head> 
                                     <body>
                                     ".$link."
@@ -369,7 +368,7 @@ class AuthController extends BaseController{
             } catch (Exception $e) {
                 $mensaje= "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
             }
-        }//Fin de si es la versión de desarrollo o producción
+        //}//Fin de si es la versión de desarrollo o producción
         return $mensaje;
     }
 }

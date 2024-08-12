@@ -6,7 +6,7 @@ import es.tipolisto.breeds.data.models.dog.DogTL
 
 data class DogScreenState(
     val listRandomDogs: MutableList<DogTL?> = mutableListOf(null, null, null),
-    var lives:Int=5,
+    var lives:Int=7,
     var score:Int=0,
     var correctAnswer:Int=0
 )

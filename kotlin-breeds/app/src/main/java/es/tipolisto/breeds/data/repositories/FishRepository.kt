@@ -39,7 +39,7 @@ class FishRepository {
         }
 
 
-        fun getRandomListFishFromBuffer(): MutableList<FishTL?>{
+        /*fun get3RandomListFishFromBuffer(): MutableList<FishTL?>{
             var listFish= mutableListOf<FishTL?>()
             var fish : FishTL?=null
             if(FishProvider.listFish.isNotEmpty()){
@@ -51,6 +51,25 @@ class FishRepository {
                 }
                 for(i in setRandom){
                     listFish.add(FishProvider.listFish[i])
+                }
+            }else{
+                Log.d("TAG3", "la lista esta vacia")
+            }
+            return listFish
+        }*/
+
+        fun get3RandomListFishFromBuffer(): MutableList<FishTL?>{
+            var listFish= mutableListOf<FishTL?>()
+            if(!FishProvider.listFish.isEmpty()){
+                //Obtenemos los 3 números aleatorios diferentes
+                val setRandom= mutableSetOf<Int>()
+                //Como los et no pueden tener repetidos los metemos en un set
+                while (setRandom.size<3){
+                    val i=Random.nextInt(30)
+                    if(!setRandom.contains(FishProvider.listFish[i].specie_id)){
+                        setRandom.add(FishProvider.listFish[i].specie_id)
+                        listFish.add(FishProvider.listFish[i])
+                    }
                 }
             }else{
                 Log.d("TAG3", "la lista esta vacia")
@@ -70,7 +89,7 @@ class FishRepository {
         }
     }//Final del cpompanion object
 
-    fun getSpecieNameByIdFish(id:Int):String{
+    /*fun getSpecieNameByIdFish(id:Int):String{
         var name=""
         FishProvider.listSpecieFish.forEach {
             val idFish = it.id;
@@ -79,5 +98,5 @@ class FishRepository {
             }
         }
         return name
-    }
+    }*/
 }

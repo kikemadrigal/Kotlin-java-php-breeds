@@ -64,11 +64,12 @@ class CompetitionViewModel(private val recordDao:RecordDao): ViewModel() {
     fun get3Ramdom(){
         viewModelScope.launch {
             if (clickPressed)delay(2000)
+            stateIsloading=true
             //Seleccionamos la lista que vamos a utilizar
             state.listSelected = Random.nextInt(0..2)
             when(state.listSelected){
                 0->{
-                    val listRandomCats= CatRepository.getListRandomCatsFromBuffer()
+                    val listRandomCats= CatRepository.getList3RandomCatsFromBuffer()
                     state=state.copy(listRandomCats=listRandomCats)
                     Log.d("TAG2", "CompetitionViewModel: Cat 1->${CatRepository.getBreedCatFromBreedIdFromBuffer(listRandomCats[0]?.breed_id)?.name_es}")
                     Log.d("TAG2", "CompetitionViewModel: Cat 2->${CatRepository.getBreedCatFromBreedIdFromBuffer(listRandomCats[1]?.breed_id)?.name_es}")
@@ -76,7 +77,7 @@ class CompetitionViewModel(private val recordDao:RecordDao): ViewModel() {
                     Log.d("TAG2", "CompetitionViewModel: El Cat elegido es el ${state.correctAnswer+1}->${CatRepository.getBreedCatFromBreedIdFromBuffer(state.listRandomCats[state.correctAnswer]?.breed_id)?.name_es}")
                 }
                 1->{
-                    val listRandomDogs= DogRepository.getRandomListDogsFromBuffer()
+                    val listRandomDogs= DogRepository.get3RandomListDogsFromBuffer()
                     state=state.copy(listRandomDogs=listRandomDogs)
                     Log.d("TAG2", "DogViewModel: dog 1->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[0]?.breed_id)?.name_es}")
                     Log.d("TAG2", "DogViewModel: dog 2->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[1]?.breed_id)?.name_es}")
@@ -84,7 +85,7 @@ class CompetitionViewModel(private val recordDao:RecordDao): ViewModel() {
                     Log.d("TAG2", "DogViewModel: El dog elegido es el ${state.correctAnswer+1}->${DogRepository.getBreedDogNameByBreedIdDog(state.listRandomDogs[state.correctAnswer]?.breed_id)?.name_es}")
                 }
                 2->{
-                    val listRandomFish= FishRepository.getRandomListFishFromBuffer()
+                    val listRandomFish= FishRepository.get3RandomListFishFromBuffer()
                     state=state.copy(listRandomFish=listRandomFish)
                     Log.d("TAG2", "FishViewModel: fish 1->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[0]?.specie_id)?.name_es}")
                     Log.d("TAG2", "FishViewModel: fish 2->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[1]?.specie_id)?.name_es}")
@@ -95,6 +96,8 @@ class CompetitionViewModel(private val recordDao:RecordDao): ViewModel() {
             //Seleccionamos una de las respuesta para que sea la correcta
             state.correctAnswer= Random.nextInt(0..2)
             clickPressed=false
+            //Este quita que se muestre el progressbar
+            stateIsloading=false
         }
     }
 

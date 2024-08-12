@@ -20,8 +20,9 @@ class CatController extends BaseController{
     public function show($param=null){
         $cat=CatRepository::getById($param[0]);
         $this->view->cat=$cat;
-        $breedCat=BreedCatRepository::getByIdName($cat->get_breed_id());       
-        $this->view->breedCatName=$breedCat->get_name();
+        $breedCat=BreedCatRepository::getByIdName($cat->get_breed_id());    
+        if($breedCat!=null)   
+            $this->view->breedCatName=$breedCat->get_name();
         $this->view->render("cat/show");
     }
     public function showRandom(){
@@ -42,6 +43,17 @@ class CatController extends BaseController{
         $this->view->page=$page;
         $this->view->rowCount=$rowCount;
         $this->view->render("cat/showAll");
+    }
+    public function showRanking($param=null){
+        $rowCount=CatRepository::getCountRows();
+        $page=(int)$param[0];
+        $init=$page*10;
+        $page+=1;
+        $cats=CatRepository::getRanking($init);
+        $this->view->cats=$cats;
+        $this->view->page=$page;
+        $this->view->rowCount=$rowCount;
+        $this->view->render("cat/showRanking");
     }
 
 
@@ -82,7 +94,10 @@ class CatController extends BaseController{
             $cat->set_sex($_POST['sex']);
             $cat->set_address($_POST['address']);
             //$cat->set_vaccines($_POST['vaccines']);
+            $cat->set_points($_POST['points']);
+            $cat->set_total_points($_POST['total_points']);
             $cat->set_path_image($_POST['path_image']);
+            $cat->set_validate($_POST['validate']);
             $cat->set_date($_POST['date']);
             $cat->set_creator_id($_POST['creator_id']);
             echo "el valor de post es ".$_POST['name_es'];
@@ -110,6 +125,13 @@ class CatController extends BaseController{
                 echo "You are not logged in";
             }
         }
+    }
+    public function updateBeauty($param=null){
+        $id_cat=$param[0];
+        $points=$param[1];
+        CatRepository::updateBeauty($id_cat, $points);
+        header("location: ".PATHSERVER."Cat/showRanking");
+        if ( PRODUCTION==1 ) echo "<script type='text/javascript'>location.href='".PATHSERVER."Cat/showRanking';</script>";    
     }
     public function delete($id=null){
         CatRepository::delete($id[0]);

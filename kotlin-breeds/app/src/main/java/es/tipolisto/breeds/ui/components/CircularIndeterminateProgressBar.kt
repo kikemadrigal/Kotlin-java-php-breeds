@@ -39,6 +39,18 @@ fun MyCircularProgressIndicator(isDisplayed:Boolean) {
         }
     }
 }
+@Composable
+fun MyCircularProgressIndicatorWithoutText(isDisplayed:Boolean) {
+    if (isDisplayed) {
+        Column (
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(10.dp,Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            CircularProgressIndicator(modifier = Modifier.size(100.dp))
+        }
+    }
+}
 
 @Preview(showSystemUi = true)
 @Composable

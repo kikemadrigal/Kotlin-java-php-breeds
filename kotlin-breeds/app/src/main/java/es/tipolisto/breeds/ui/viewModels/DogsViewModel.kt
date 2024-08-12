@@ -38,7 +38,7 @@ class DogsViewModel(private val recordDao: RecordDao): ViewModel() {
 
     fun initGame() {
         gameOver=false
-        state.lives=5
+        state.lives=7
         state.score=0
     }
     fun getAllBreedsDogs():List<BreedDogTL>{
@@ -48,16 +48,18 @@ class DogsViewModel(private val recordDao: RecordDao): ViewModel() {
     fun get3RamdomDogs(){
         viewModelScope.launch {
             if (clickPressed) delay(2000)
-            val listRandomDogs= DogRepository.getRandomListDogsFromBuffer()
+            stateIsLoading=true
+            val listRandomDogs= DogRepository.get3RandomListDogsFromBuffer()
             state=state.copy(
                 listRandomDogs=listRandomDogs
             )
             state.correctAnswer= Random.nextInt(0..2)
             clickPressed=false
-            Log.d("TAG2", "DogViewModel: dog 0->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[0]?.breed_id)}")
-            Log.d("TAG2", "DogViewModel: dog 1->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[1]?.breed_id)}")
-            Log.d("TAG2", "DogViewModel: dog 2->${DogRepository.getBreedDogNameByBreedIdDog(listRandomDogs[2]?.breed_id)}")
-            Log.d("TAG2", "DogViewModel: El elegido es el ${state.correctAnswer}->${DogRepository.getBreedDogNameByBreedIdDog(state.listRandomDogs[state.correctAnswer]?.breed_id)}")
+            stateIsLoading=false
+            Log.d("TAG2", "DogViewModel: dog 0->${DogRepository.getBreedDogNameByBreedId(listRandomDogs[0]?.breed_id)}")
+            Log.d("TAG2", "DogViewModel: dog 1->${DogRepository.getBreedDogNameByBreedId(listRandomDogs[1]?.breed_id)}")
+            Log.d("TAG2", "DogViewModel: dog 2->${DogRepository.getBreedDogNameByBreedId(listRandomDogs[2]?.breed_id)}")
+            Log.d("TAG2", "DogViewModel: El elegido es el ${state.correctAnswer}->${DogRepository.getBreedDogNameByBreedId(state.listRandomDogs[state.correctAnswer]?.breed_id)}")
         }
     }
 

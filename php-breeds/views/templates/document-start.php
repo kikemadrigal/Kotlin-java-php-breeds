@@ -25,25 +25,35 @@
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="<?php echo PATHSERVER.'home';?>">Home</a>
-            <a class="navbar-brand" href="<?php echo PATHSERVER."Beauties/showAll" ?>">Beauties</a>
-            <a class="navbar-brand" href="<?php echo PATHSERVER."Score/showAll" ?>">Scores</a>
-            <a class="navbar-brand" href="<?php echo PATHSERVER."Cat/showRandom" ?>">Cats</a>
-            <a class="navbar-brand" href="<?php echo PATHSERVER."Dog/showRandom" ?>">Dogs</a>
-            <a class="navbar-brand" href="<?php echo PATHSERVER."Fish/showRandom" ?>">Fish</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="<?php echo PATHSERVER."About" ?>">About</a></li>
-                <!--CONTROL DE USUARIOS -->
+            <a class="nav-link active" href="<?php echo PATHSERVER.'home';?>">Home</a>
+            <a class="nav-link active" href="<?php echo PATHSERVER.'Home/beauties';?>">Beauties</a>
+            <a class="nav-link active" href="<?php echo PATHSERVER."Cat/showRandom" ?>">Cats</a>
+            <a class="nav-link active" href="<?php echo PATHSERVER."Dog/showRandom" ?>">Dogs</a>
+            <a class="nav-link active" href="<?php echo PATHSERVER."Fish/showRandom" ?>">Fish</a>
+            <a class="nav-link active" href="<?php echo PATHSERVER."Score/showAll" ?>">Scores</a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        More
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li ><a class="dropdown-item" href="<?php echo PATHSERVER."Home/about" ?>">About</a></li>
+                        <li ><a class="dropdown-item" href="<?php echo PATHSERVER."Home/whatis" ?>">What is</a></li>
+                        <li ><a class="dropdown-item" href="<?php echo PATHSERVER."Home/license" ?>">License</a></li>
+                        <li ><a class="dropdown-item" href="https://play.google.com/store/apps/details?id=es.tipolisto.breeds">Download</a></li>
+                    </ul>
+                </li>
+            </ul>   
+            <!--<div class="collapse navbar-collapse" id="navbarSupportedContent">-->
+           
+                
+                    <!--CONTROL DE USUARIOS -->
                 
                 <?php
                     //Si no existe la sesión del usuario
                     
                     if(!isset($_SESSION['idusuario'])){
-                        echo"<li class='nav-item'><a class='nav-link active' href='".PATHSERVER."Auth/register'>Register</a></li><li><a class='nav-link active' href='".PATHSERVER."Auth/login'>Login</a></li>";
+                        echo"<a class='navbar-brand' href='".PATHSERVER."Auth/register'>Register</a><a class='navbar-brand' href='".PATHSERVER."Auth/login'>Login</a>";
                     }else{
                         if($_SESSION['nivelaccesousuario']==0){
                             $roll="Sin validar";
@@ -55,12 +65,11 @@
                         }          
                         } 
                         
-                        echo "<li class='nav-item m-2'>User: ".$_SESSION['nombreusuario']."</li>";
-                        echo "<li class='nav-item m-2'><a href='".PATHSERVER."Auth/logout'>Logout</a></li>";
+                        echo "<a class='navbar-brand' >User: ".$_SESSION['nombreusuario']."</a>";
+                        echo "<a class='navbar-brand' href='".PATHSERVER."Auth/logout'>Logout</a>";
                     }
                     ?>
-                </ul>
-            </div>
+
             <!--Form users -->     
             <!--<form class="d-flex g-3 align-items-center" method=post action='<?php echo PATHSERVER; ?>Game/search' >
                 <input class="form-control me-2" type="search" name="search" id="search" placeholder="Search" aria-label="Search" >
@@ -88,18 +97,13 @@
             ?>
                 <nav aria-label="breadcrumb">
                     <ol class='breadcrumb'>
-                        <!--Estos enlaces van a la direccion http://www.gestorwebs.tipolisto.es/gestionarwebs.php?idCategoria=66 por ejemplo
-                        Pero han sido sobreescritos con mod_rewrite del archivo .htacces fichero de configuración de apache-->
-                        <li class="breadcrumb-item"><a href='<?php echo PATHSERVER ?>Quiz/showAllByUser'>My Quizs</a></li>
-                        <li class="breadcrumb-item"><a href='<?php echo PATHSERVER ?>Quiz/insert'>New quiz</a></li>
                         <li class="breadcrumb-item"><a href='<?php echo PATHSERVER ?>User/update'>My data</a></li>
-                        <li class="breadcrumb-item"><a href='<?php echo PATHSERVER ?>Database/show'>Database</a></li>
-                        <li class="breadcrumb-item"><a href='<?php echo PATHSERVER ?>Media/showAll'>Images</a></li>
+                        <li class="breadcrumb-item"><a href='<?php echo PATHSERVER ?>User/showAll'>My animals</a></li>
                     </ol> 
-                    <form class="d-flex col-md-4" method=post action='<?php echo PATHSERVER; ?>Quiz/searchUser'>
-                        <input class="form-control" type="search" name="search" id="search" placeholder="Search your quizs" aria-label="search your games">
+                    <!--<form class="d-flex col-md-4" method=post action='<?php echo PATHSERVER; ?>User/searchUser'>
+                        <input class="form-control" type="search" name="search" id="search" placeholder="Search your Cat" aria-label="search your games">
                         <button class="btn btn-outline-success" type="submit" name="submit">Search</button>
-                    </form> 
+                    </form> -->
                 </nav>
             <?php                   
             }

@@ -59,23 +59,31 @@ class FavoritesViewModel(private val favoritesDao: FavoritesDao): ViewModel() {
         )
         return listFavorites
     }
-
+/*
+    @ColumnInfo(name = "idAnimal") val idAnimal: String,
+    @ColumnInfo(name = "nameBreed") val nameBreed: String,
+    //Puede ser animal: cat, dog o fish
+    @ColumnInfo(name = "animal") val animal: String,
+    @ColumnInfo(name = "image") val image: String,
+    @ColumnInfo(name = "description") val description: String,
+    @ColumnInfo(name = "date") val date: String
+ */
 
     fun createFavorite(breedCat: BreedCatTL){
         //Creamos el favorito a partir del idBreed
-        val favorite=FavoritesEntity(null, breedCat.id.toString(), breedCat.name, "Cat", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat.path_image,breedCat.description, Date().toString())
+        val favorite=FavoritesEntity(null, breedCat.id.toString(), breedCat.name_es, "Cat", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat.path_image,breedCat.description_es, Date().toString())
         //val favorite= FavoritesRepository.getById(context,id)
         FavoritesRepository.insert(favoritesDao,favorite)
         //FavoritesRepository.insert(context,favorite)
         //Log.d("TAG","FisViewModel die: preparada el id: "+idBreed+"para añadir a favoritos a "+favorite.toString())
     }
     fun createFavorite(breedDog: BreedDogTL){
-        val favorite=FavoritesEntity(null, breedDog.id.toString(), breedDog.name, "Dog", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedDog.path_image,breedDog.breed_id, Date().toString())
+        val favorite=FavoritesEntity(null, breedDog.id.toString(), breedDog.name_es, "Dog", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedDog.path_image,breedDog.description_es, Date().toString())
         FavoritesRepository.insert(favoritesDao,favorite)
     }
     fun createFavorite(specieFish: SpecieFishTL?){
         if(specieFish!=null){
-            val favorite=FavoritesEntity(null, specieFish.id.toString(), specieFish.name, "Fish", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+specieFish.path_image,specieFish.name_es, Date().toString())
+            val favorite=FavoritesEntity(null, specieFish.id.toString(), specieFish.name_es, "Fish", Constants.URL_BASE_IMAGES_TIPOLISTO_ES+specieFish.path_image,specieFish.description, Date().toString())
             FavoritesRepository.insert(favoritesDao,favorite)
         }
     }

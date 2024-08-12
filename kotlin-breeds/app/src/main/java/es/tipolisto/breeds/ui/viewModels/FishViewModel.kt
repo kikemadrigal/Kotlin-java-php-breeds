@@ -40,7 +40,7 @@ class FishViewModel(private val recordDao: RecordDao): ViewModel() {
 
     fun initGame() {
         gameOver=false
-        state.lives=5
+        state.lives=7
         state.score=0
     }
     fun getAllSpeciesFish():List<SpecieFishTL>{
@@ -49,18 +49,22 @@ class FishViewModel(private val recordDao: RecordDao): ViewModel() {
     fun get3RamdomFish(){
         viewModelScope.launch {
             if (clickPressed) delay(2000)
-            val listRandomFish= FishRepository.getRandomListFishFromBuffer()
+            stateIsLoading=true
+            val listRandomFish= FishRepository.get3RandomListFishFromBuffer()
             state=state.copy(
                 listRandomFish=listRandomFish
             )
             state.correctAnswer= Random.nextInt(0..2)
             clickPressed=false
+            stateIsLoading=false
             Log.d("TAG2", "FishViewModel: fish 1->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[0]?.specie_id)?.name_es}")
             Log.d("TAG2", "FishViewModel: fish 2->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[1]?.specie_id)?.name_es}")
             Log.d("TAG2", "FishViewModel: fish 3->${FishRepository.getSpecieFishFromSpecieIdInBuffer(listRandomFish[2]?.specie_id)?.name_es}")
             Log.d("TAG2", "FishViewModel: El elegido es el ${state.correctAnswer}->${FishRepository.getSpecieFishFromSpecieIdInBuffer(state.listRandomFish[state.correctAnswer]?.specie_id)?.name_es}")
         }
     }
+
+
 
     fun getActiveFish(): FishTL?{
         return state.listRandomFish[state.correctAnswer]

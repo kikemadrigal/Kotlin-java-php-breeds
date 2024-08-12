@@ -25,9 +25,27 @@ fun getWebAnnotated(): AnnotatedString {
     }
 }
 @Composable
+fun getWhatisAnnotated(): AnnotatedString {
+    return buildAnnotatedString {
+        val text="What is: https://breeds.tipolisto.es/index/Home/whatis"
+        append(text)
+        addStyle(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary
+            ), start = 5, end = text.length
+        )
+        addStringAnnotation(
+            tag = "What is",
+            annotation = "https://breeds.tipolisto.es/index/Home/whatis",
+            start = 5,
+            end = text.length
+        )
+    }
+}
+@Composable
 fun getTermsAnnotated(): AnnotatedString {
     return buildAnnotatedString {
-        val text="Terms: https://google.com/terms"
+        val text="Terms: https://breeds.tipolisto.es/index/Home/license"
         append(text)
         addStyle(
             SpanStyle(
@@ -35,8 +53,8 @@ fun getTermsAnnotated(): AnnotatedString {
             ), start = 6, end = text.length
         )
         addStringAnnotation(
-            tag = "terms",
-            annotation = "https://google.com/terms",
+            tag = "Terms",
+            annotation = "https://breeds.tipolisto.es/index/Home/license",
             start = 6,
             end = text.length
         )
@@ -46,7 +64,7 @@ fun getTermsAnnotated(): AnnotatedString {
 @Composable
 fun getContactAnnotated(): AnnotatedString {
     return buildAnnotatedString {
-        val text="Contact: email://adm.tipolisto.es"
+        val text="Contact: https://breeds.tipolisto.es/index/Home/about"
         append(text)
         addStyle(
             SpanStyle(
@@ -54,8 +72,8 @@ fun getContactAnnotated(): AnnotatedString {
             ), start = 8, end = text.length
         )
         addStringAnnotation(
-            tag = "contact",
-            annotation = "email://adm.tipolisto.es",
+            tag = "Contact",
+            annotation = "https://breeds.tipolisto.es/index/Home/about",
             start = 8,
             end = text.length
         )
@@ -72,7 +90,7 @@ fun getRegisterAnnotated(): AnnotatedString {
             ), start = 9, end = text.length
         )
         addStringAnnotation(
-            tag = "register",
+            tag = "Register",
             annotation = "https://breeds.tipolisto.es/index/Auth/register",
             start = 9,
             end = text.length
@@ -82,18 +100,58 @@ fun getRegisterAnnotated(): AnnotatedString {
 @Composable
 fun getRateBeautiesAnnotated(): AnnotatedString {
     return buildAnnotatedString {
-        val text="Puntuar: https://breeds.tipolisto.es/index/Beauties/showRandom"
+        val text="Beauties: https://breeds.tipolisto.es/index/Home/beauties"
         append(text)
         addStyle(
             SpanStyle(
-                color = MaterialTheme.colorScheme.primary
-            ), start = 8, end = text.length
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+            ), start = 17, end = text.length
         )
         addStringAnnotation(
-            tag = "Puntuar",
-            annotation = "https://breeds.tipolisto.es/index/Beauties/showRandom",
-            start = 8,
+            tag = "Beauties",
+            annotation = "https://breeds.tipolisto.es/index/Home/beauties",
+            start = 17,
             end = text.length
         )
     }
 }
+@Composable
+fun getMyNaimalsAnnotated(): AnnotatedString {
+    return buildAnnotatedString {
+        val text="My animals: https://breeds.tipolisto.es/index/User/showAll"
+        append(text)
+        addStyle(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+            ), start = 12, end = text.length
+        )
+        addStringAnnotation(
+            tag = "My animals",
+            annotation = "https://breeds.tipolisto.es/index/User/showAll",
+            start = 12,
+            end = text.length
+        )
+    }
+}
+@Composable
+fun getRecordsAnnotated(): AnnotatedString {
+    return buildAnnotatedString {
+        val text="Records: https://breeds.tipolisto.es/index/Score/showAll"
+        append(text)
+        addStyle(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+            ), start = 9, end = text.length
+        )
+        addStringAnnotation(
+            tag = "Records",
+            annotation = "https://breeds.tipolisto.es/index/Score/showAll",
+            start = 9,
+            end = text.length
+        )
+    }
+}
+

@@ -1,6 +1,6 @@
 package es.tipolisto.breeds.ui.views.screens.fish
 
-import android.util.Log
+
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -19,8 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,7 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.repositories.FishRepository
@@ -70,7 +71,7 @@ import es.tipolisto.breeds.utils.MediaPlayerClient
 @Composable
 fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, recordsViewModel: RecordsViewModel, mediaPlayerClient: MediaPlayerClient){
     val context=LocalContext.current
-    var isDarkMode by remember { mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context)) }
+    val isDarkMode by remember { mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context)) }
 
     DisposableEffect(Unit) {
         if(PreferenceManager.readPreferenceMusicOnOff(context)){
@@ -88,8 +89,7 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, r
     }
     //Conrol del botón atrás
     BackHandler{
-        fishViewModel.initGame()
-        onBackPressed(navController,context)
+        onBackPressed({fishViewModel.initGame()},navController,context)
     }
 
     BreedsTheme(darkTheme = isDarkMode) {
@@ -106,11 +106,10 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, r
                     navigationIcon = {
                         IconButton(
                                 onClick = {
-                                    fishViewModel.initGame()
-                                    onBackPressed(navController,context)
+                                    onBackPressed({fishViewModel.initGame()},navController,context)
                                 }
                         ) {
-                            Icon( imageVector = Icons.Default.ArrowBack,contentDescription = "Back" )
+                            Icon( imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back" )
                         }
                     },
                     actions = {
@@ -130,6 +129,8 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, r
                 )
             }
         ) {
+            if(fishViewModel.getAllSpeciesFish().isEmpty())
+                navController.navigate(AppScreens.SplashScreen.route)
             GameFishScreenContent(it, fishViewModel, recordsViewModel,navController, mediaPlayerClient)
         }
     }
@@ -150,7 +151,9 @@ fun GameFishScreenPreview() {
 fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewModel, recordsViewModel: RecordsViewModel,navController: NavController, mediaPlayerClient: MediaPlayerClient){
     var showNewRecordDialog by rememberSaveable { mutableStateOf(true) }
     val stateNewRecord: Boolean by recordsViewModel.stateNewrecord.observeAsState(false)
-
+    val context= LocalContext.current
+    if(fishViewModel.getAllSpeciesFish().isEmpty())
+        navController.navigate(AppScreens.SplashScreen.route)
     Column (
         modifier = Modifier
             .fillMaxHeight()
@@ -159,10 +162,7 @@ fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewM
 
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        if(fishViewModel.stateIsLoading){
-            MyCircularProgressIndicator(isDisplayed = true)
-        }else
-            MyCircularProgressIndicator(isDisplayed = false)
+
         if(fishViewModel.gameOver) {
             recordsViewModel.checkRecord(fishViewModel.state.score)
             if(stateNewRecord) {
@@ -172,10 +172,18 @@ fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewM
                         showNewRecordDialog = false
                     },
                     { name->
-                        recordsViewModel.insertNewRecord(name,fishViewModel.state.score, "fish")
-                        fishViewModel.initGame()
-                        navController.popBackStack()
-                        navController.navigate(AppScreens.MenuScreen.route)
+                        if(name.length>30) Toast.makeText(context,"The name must have less than 30 characters",Toast.LENGTH_LONG).show()
+                        else if(name.length<3) Toast.makeText(context,"Name too short",Toast.LENGTH_LONG).show()
+                        else {
+                            recordsViewModel.insertNewRecord(
+                                name,
+                                fishViewModel.state.score,
+                                "fish"
+                            )
+                            fishViewModel.initGame()
+                            navController.popBackStack()
+                            navController.navigate(AppScreens.MenuScreen.route)
+                        }
                     }
                 )
             }else {
@@ -187,6 +195,10 @@ fun GameFishScreenContent(paddingsValues:PaddingValues, fishViewModel: FishViewM
             FishHud(fishViewModel)
             //Pintamos la imagen del gato activo
             DrawImageFish(fishViewModel)
+            if(fishViewModel.stateIsLoading){
+                MyCircularProgressIndicator(isDisplayed = true)
+            }else
+                MyCircularProgressIndicator(isDisplayed = false)
             //Pondreos el resultado a verdadero o falso
             FishTest(fishViewModel, mediaPlayerClient)
         }
@@ -227,9 +239,12 @@ fun DrawImageFish(fishViewModel: FishViewModel){
         )
 
     }else{
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+fish.path_image,
             contentDescription = "Select a specie",
+            loading = {
+                CircularProgressIndicator(color = Color.Blue)
+            },
             modifier = Modifier
                 .size(300.dp, 300.dp)
                 .padding(top = 20.dp),
@@ -248,11 +263,13 @@ fun FishTest(fishViewModel: FishViewModel, mediaPlayerClient:MediaPlayerClient){
         TextButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                fishViewModel.checkCorrectAnswer(i)
-                if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
-                else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
-                fishViewModel.clickPressed=true
-                fishViewModel.get3RamdomFish()
+                if(!fishViewModel.clickPressed) {
+                    fishViewModel.checkCorrectAnswer(i)
+                    if (correctAnswer == i) mediaPlayerClient.playSound(AudioEffectsType.typeSuccess)
+                    else mediaPlayerClient.playSound(AudioEffectsType.typeFail)
+                    fishViewModel.clickPressed = true
+                    fishViewModel.get3RamdomFish()
+                }
             }
         ) {
             val specieId=fishViewModel.state.listRandomFish[i]?.specie_id
@@ -262,7 +279,7 @@ fun FishTest(fishViewModel: FishViewModel, mediaPlayerClient:MediaPlayerClient){
             if(fishViewModel.clickPressed){
                 Text(
                     text = text,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color=if(correctAnswer==i)Color.Black else Color.White,
                     style = MaterialTheme.typography.titleLarge,
@@ -273,8 +290,8 @@ fun FishTest(fishViewModel: FishViewModel, mediaPlayerClient:MediaPlayerClient){
             }else{
                 Text(
                     text = text,
-                    //maxLines = 1,
-                    //overflow = TextOverflow.Ellipsis,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground ,
                     modifier=Modifier

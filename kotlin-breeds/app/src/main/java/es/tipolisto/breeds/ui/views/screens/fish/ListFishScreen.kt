@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -38,8 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
-import es.tipolisto.breeds.data.models.fish.Fish
-import es.tipolisto.breeds.data.models.fish.FishTL
 import es.tipolisto.breeds.data.models.fish.SpecieFishTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.ui.navigation.AppScreens
@@ -66,12 +63,14 @@ fun ListFishScreen(navController:NavController,fishViewModel: FishViewModel) {
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
                 )
             }
         ) {
+            if(fishViewModel.getAllSpeciesFish().isEmpty())
+                navController.navigate(AppScreens.SplashScreen.route)
             LazyColumn(
                 modifier = Modifier
                     .padding(it)

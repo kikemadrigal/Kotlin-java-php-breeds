@@ -1,7 +1,0 @@
-
-. Termina lo de los records en dogs y fish
--termina la camara y fotos
--empieza la el backend
-
-
-

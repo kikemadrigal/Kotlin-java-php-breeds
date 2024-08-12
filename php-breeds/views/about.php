@@ -1,12 +1,8 @@
-<?php 
-
-
-include_once("./views/templates/document-start.php");
-?>
+<?php include_once("./views/templates/document-start.php");?>
 <h1>All of us</h1>
 <div class="row">
     <div class="col">
-        <img class="img-fluid mt-4 rounded" src="<?php echo PATHSERVERSININDEX;?>media/amigos.png" width='500px' />
+        <img class="img-fluid mx-auto rounded " src="<?php echo PATHSERVERSININDEX;?>media/amigos.png" width='500px' />
     </div>
     <div class="col">
         <br><br>  
@@ -15,9 +11,7 @@ include_once("./views/templates/document-start.php");
         <hr>
         <p>We are a group of friends who love animals..</p>
         <p>A hug.</p>
-    </div>
-    <div class="col">
-    <a href="https://tipolisto.es/about.php?web=breeds.tipolisto.es"><img src='<?php echo PATHSERVERSININDEX;?>media/icon-send-email.png' width='150px'/> Send email</a>
+        <a href="https://tipolisto.es/about.php?web=breeds.tipolisto.es"><img src='<?php echo PATHSERVERSININDEX;?>media/icon-send-email.png' width='150px'/> Send email</a>
     </div>
 </div>
 <h1>Cats</h1>
@@ -53,7 +47,4 @@ include_once("./views/templates/document-start.php");
         
     </div>
 </div>
-
-
-
 <?php include_once("./views/templates/document-end.php");?>

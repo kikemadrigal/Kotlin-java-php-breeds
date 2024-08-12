@@ -44,7 +44,17 @@ class DogController extends BaseController{
         $this->view->rowCount=$rowCount;
         $this->view->render("dog/showAll");
     }
-
+    public function showRanking($param=null){
+        $rowCount=DogRepository::getCountRows();
+        $page=$param[0];
+        $init=$page*10;
+        $page+=1;
+        $dogs=DogRepository::getRanking($init);
+        $this->view->dogs=$dogs;
+        $this->view->page=$page;
+        $this->view->rowCount=$rowCount;
+        $this->view->render("dog/showRanking");
+    }
 
     public function showUser($param = null){
         $this->view->param=$param;
@@ -83,7 +93,10 @@ class DogController extends BaseController{
             $dog->set_sex($_POST['sex']);
             $dog->set_address($_POST['address']);
             $dog->set_vaccines($_POST['vaccines']);
+            $dog->set_points($_POST['points']);
+            $dog->set_total_points($_POST['total_points']);
             $dog->set_path_image($_POST['path_image']);
+            $dog->set_validate($_POST['validate']);
             $dog->set_date($_POST['date']);
             $dog->set_creator_id($_POST['creator_id']);
             if ($dog!=null){
@@ -109,7 +122,19 @@ class DogController extends BaseController{
             }
         }
     }
+    public function updateBeauty($param=null){
+        $id_dog=$param[0];
+        $points=$param[1];
+        DogRepository::updateBeauty($id_dog, $points);
+        header("location: ".PATHSERVER."Dog/showRanking");
+        if ( PRODUCTION==1 ) echo "<script type='text/javascript'>location.href='".PATHSERVER."Dog/showRanking';</script>";    
+    }
     public function delete($id=null){
+        //Necesitamos el path de la imagen para poder borrarla
+        $dog=DogRepository::getById($id[0]);
+        if (file_exists("./".$dog->get_path_image())) {
+            unlink("./".$dog->get_path_image());
+         }
         DogRepository::delete($id[0]);
         header("location: ".PATHSERVER."Game/showByCategoriesUsers");
         if ( PRODUCTION==1 ) echo "<script type='text/javascript'>location.href='".PATHSERVER."Game/showByCategoriesUsers';</script>";

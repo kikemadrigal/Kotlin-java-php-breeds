@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import es.tipolisto.breeds.data.database.AppDataBase
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.ui.viewModels.BeautyViewModel
 import es.tipolisto.breeds.ui.viewModels.CatsViewModel
 import es.tipolisto.breeds.ui.viewModels.CompetitionViewModel
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
@@ -49,6 +50,7 @@ fun AppNavigation(
     favoritesViewModel: FavoritesViewModel,
     recordsViewModel:RecordsViewModel,
     loginViewModel: LoginViewModel,
+    beautyViewModel: BeautyViewModel,
     mediaPlayerClient:MediaPlayerClient
 ){
     val navController = rememberNavController()
@@ -72,7 +74,7 @@ fun AppNavigation(
             SettingsScreen(navController,mediaPlayerClient)
         }
         composable(AppScreens.BeautiesScreen.route){
-            BeautiesScreen(navController)
+            BeautiesScreen(navController, beautyViewModel)
         }
         composable(AppScreens.LoginScreen.route){
             LoginScreen(loginViewModel,navController)

@@ -2,7 +2,6 @@ package es.tipolisto.breeds.data.repositories
 
 import android.util.Log
 import es.tipolisto.breeds.data.models.cat.BreedCatTL
-import es.tipolisto.breeds.data.models.cat.Cat
 import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.network.RetrofitClient
 import es.tipolisto.breeds.data.providers.CatProvider
@@ -26,17 +25,23 @@ class CatRepository {
 
         fun getListCatsFromBuffer()=CatProvider.listCats
 
-        fun getListRandomCatsFromBuffer(): MutableList<CatTL?>{
+        fun getList3RandomCatsFromBuffer(): MutableList<CatTL?>{
             var listCats= mutableListOf<CatTL?>()
-            if(CatProvider.listCats.isNotEmpty()){
+            if(!CatProvider.listCats.isEmpty()){
                 //Obtenemos los 3 números aleatorios diferentes
-                val setRandom= mutableSetOf<Int>()
+                val setRandom= mutableSetOf<String>()
                 //Como los et no pueden tener repetidos los metemos en un set
                 while (setRandom.size<3){
-                    setRandom.add(Random.nextInt(CatProvider.listCats.size))
-                }
-                for(i in setRandom){
-                    listCats.add(CatProvider.listCats[i])
+                    var i=Random.nextInt(CatProvider.listCats.size)
+                    if(!setRandom.contains(CatProvider.listCats[i].breed_id)){
+                        setRandom.add(CatProvider.listCats[i].breed_id)
+                        listCats.add(CatProvider.listCats[i])
+                    }
+                    listCats.forEach {
+                        if(it?.breed_id=="") {
+                            Log.d("TAG", "CatRepository: Hay un gato sin raza")
+                        }
+                    }
                 }
             }else{
                 Log.d("TAG3", "la lista esta vacia")
@@ -68,9 +73,11 @@ class CatRepository {
 
         fun getBreedCatNameByIdCat(id:String?):String{
             var name=""
+            //Log.d("TAG2", "CatRepository dice: vamos a buscar el nombre del gato con el id: $id")
             CatProvider.listBreedCats.forEach {
-                val idCat = it.id_name;
-                if (idCat.equals(id)) name = it.name_es
+                val idCat = it.id_name.trim()
+                if (idCat.equals(id))
+                    name = it.name_es
             }
             return name
         }

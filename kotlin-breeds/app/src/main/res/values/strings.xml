@@ -30,7 +30,10 @@
     <string name="dog_origin">origin</string>
 
 
-    <string name="settings_description">Choose whether you want to guess the breed of the cat or the dog. You have 7 lives. Choose settings to change the game characteristics.</string>
+    <string name="settings_description1">In the main menu choose whether you want to guess the breed of cat, dog or species of fish.\nYou have 7 lives.\nYou can get more information about the game by clicking on the following link:</string>
+    <string name="settings_description2">If you click on competition (the kangaroos fighting) you can compete in this internet records table, these records appear identified as mix in the records view of the app.</string>
+    <string name="settings_description3">If you click on beauties you can upload your pet and rate others to compete in this ranking of beauties:</string>
+
     <string name="cat_game_playing_cat_breeds">Playing cat breeds</string>
     <string name="dog_game_playing_dog_breeds">Playing dog breeds</string>
     <string name="fish_game_Playing_fish_species">Playing fish species</string>
@@ -58,5 +61,21 @@
     <string name="dog_description">Description</string>
     <string name="dog_morphology">Morphology</string>
     <string name="Competition">Competition</string>
-    <string name="you_need_to_register">You need to register</string>
+    <string name="you_need_to_register">To upload, you need to be registered at:</string>
+    <string name="Upload_beauty">Upload beauty</string>
+    <string name="please_wait">Please wait</string>
+    <string name="no_internet_connection">Without internet connection the program freezes</string>
+    <string name="congratulations">Congratulations</string>
+    <string name="you_have_achieved_a_new_record">You have achieved a new record</string>
+    <string name="create_new_record">Create new record</string>
+    <string name="you_must_select_a_photo">You must select a photo</string>
+    <string name="you_must_select_an_image_of_the_animal">You must select an image of the animal</string>
+    <string name="you_must_write_the_name_of_the_animal">You must write the name of the animal</string>
+    <string name="you_must_enter_the_username_and_password">You must enter the username and password</string>
+    <string name="you_do_not_have_permissions">You do not have permissions</string>
+    <string name="you_must_select_whether_it_is_a_cat_dog_or_fish">You must select whether it is a cat, dog or fish</string>
+    <string name="you_can_see_your_animals_at">You can see your animals at:</string>
+    <string name="the_image_already_exists_in_your_account_it_has_not_been_saved">The image already exists in your account, it has not been saved</string>
+    <string name="records_view_internet_records">View internet records</string>
+    <string name="login">Login</string>
 </resources>

@@ -1,10 +1,10 @@
 package es.tipolisto.breeds.data.models.user
 
 data class User(
-    val name: String,
-    val password: String,
-    val score: Int,
-    val nameBeaduty: String,
-    val description: String,
-    val image: String
+    var name: String="",
+    var password: String="",
+    var score: Int=0,
+    var nameBeaduty: String="",
+    var description: String="",
+    var image: String=""
 )

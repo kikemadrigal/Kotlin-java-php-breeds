@@ -162,6 +162,13 @@ interface IApiService {
     suspend fun getAllFish(): Response<List<FishTL>>
 
 
+    @POST("checkUser.php")
+    @FormUrlEncoded
+    suspend fun checkUser(
+        @Field("name") name: String,
+        @Field("password") password: String,
+    ): Response<String>
+
 
     @POST("saveScore.php")
     @FormUrlEncoded
@@ -174,10 +181,33 @@ interface IApiService {
     @POST("saveBeauty.php")
     @FormUrlEncoded
     suspend fun saveBeauty(
+        @Field("nameUser") nameUser: String,
         @Field("name") name: String,
-        @Field("password") password: String,
-        @Field("nameBeauty") nameBeauty: String,
+        @Field("type") type: String,
+        @Field("breed") breed: String,
+        @Field("family") family: String,
         @Field("description") description: String,
+        @Field("year_of_birth") year_of_birth: String,
+        @Field("sex") sex: String,
+        @Field("address") address: String,
         @Field("image") image: String
     ): Response<String>
+
+    @POST("checkImageBeauty.php")
+    @FormUrlEncoded
+    suspend fun checkImageBeauty(
+        @Field("nameUser") nameUser: String,
+        @Field("name") name: String,
+    ): Response<String>
 }
+/*
+    var name: String="",
+    var type: String="",
+    var breed: String="",
+    var family: String="",
+    var description: String="",
+    var year_of_birth: String="",
+    var sex: String="",
+    var address: String="",
+    var path_image: String=""
+ */

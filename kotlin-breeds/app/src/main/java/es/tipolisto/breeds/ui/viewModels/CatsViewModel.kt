@@ -28,11 +28,12 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
     var stateIsloading by mutableStateOf(false)
     var gameOver by mutableStateOf(false)
         private set
+    //clikPressed sirve para poner color a la respuesta correcta
     var clickPressed by mutableStateOf(false)
 
     fun initGame() {
         gameOver=false
-        state.lives=5
+        state.lives=7
         state.score=0
     }
 
@@ -47,18 +48,21 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
     fun get3RamdomCats(){
         viewModelScope.launch {
             if (clickPressed)delay(2000)
-            val listRandomCats= CatRepository.getListRandomCatsFromBuffer()
+            stateIsloading=true
+            val listRandomCats= CatRepository.getList3RandomCatsFromBuffer()
             state=state.copy(
                 listRandomCats=listRandomCats
             )
             //Seleccionamos una de las respuesta para que sea la correcta
             state.correctAnswer= Random.nextInt(0..2)
             clickPressed=false
-
+            stateIsloading=false
             Log.d("TAG2", "CatViewModel: Cat 1->${CatRepository.getBreedCatNameByIdCat(listRandomCats[0]?.breed_id)}")
             Log.d("TAG2", "CatViewModel: Cat 2->${CatRepository.getBreedCatNameByIdCat(listRandomCats[1]?.breed_id)}")
             Log.d("TAG2", "CatViewModel: Cat 3->${CatRepository.getBreedCatNameByIdCat(listRandomCats[2]?.breed_id)}")
-            Log.d("TAG2", "CatViewModel: El elegido es el ${state.correctAnswer}->${state.listRandomCats[state.correctAnswer]?.breed_id}")
+            var selected=state.listRandomCats[state.correctAnswer]?.breed_id
+            var id=state.listRandomCats[state.correctAnswer]?.id
+            Log.d("TAG2", "CatViewModel: El elegido es el ${state.correctAnswer+1}-> id: $id: ${CatRepository.getBreedCatNameByIdCat(selected)}")
         }
     }
     //getActiveCat:Solo usada para obtener la imagen

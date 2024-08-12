@@ -3,7 +3,6 @@
 package es.tipolisto.breeds.ui.views.screens
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +28,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,19 +38,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.ui.components.getContactAnnotated
+import es.tipolisto.breeds.ui.components.getRateBeautiesAnnotated
+import es.tipolisto.breeds.ui.components.getRecordsAnnotated
 import es.tipolisto.breeds.ui.components.getTermsAnnotated
 import es.tipolisto.breeds.ui.components.getWebAnnotated
+import es.tipolisto.breeds.ui.components.getWhatisAnnotated
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.utils.MediaPlayerClient
 
@@ -81,7 +78,7 @@ fun SettingsScreen(navController:NavController, mediaPlayerClient: MediaPlayerCl
                     ),
                     navigationIcon={
                         IconButton(onClick = { navController.popBackStack()}) {
-                            Icon(imageVector = Icons.Default.ArrowBack,contentDescription = "Back", tint = Color.White)
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back", tint = Color.White)
                         }
                     }
                 )
@@ -146,11 +143,8 @@ fun SettingsScreen(navController:NavController, mediaPlayerClient: MediaPlayerCl
                             isDarkMode=!isDarkMode
                             PreferenceManager.savePreferenceThemeDarkOnOff(context,it)
                         },
-
                     )
                 }
-
-
                 Texts()
             }
 
@@ -173,8 +167,11 @@ fun Texts(){
 
     val uriHandler= LocalUriHandler.current
     val webAnnotated= getWebAnnotated()
+    val whatisAnnotated= getWhatisAnnotated()
     val termsAnnotated = getTermsAnnotated()
     val contactAnnotated=getContactAnnotated()
+    val recordsAnnotated= getRecordsAnnotated()
+    val rateBeautiesAnnotated= getRateBeautiesAnnotated()
     Column (modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(15.dp)){
         ClickableText(
             text = webAnnotated,
@@ -189,23 +186,52 @@ fun Texts(){
         ClickableText(
             text = termsAnnotated,
             onClick = { offset ->
-                val uri=termsAnnotated.getStringAnnotations(tag = "contact",start = offset, end = offset).firstOrNull()?.item
+                val uri=termsAnnotated.getStringAnnotations(tag = "Terms",start = offset, end = offset).firstOrNull()?.item
                 if(uri!=null)
                     uriHandler.openUri(uri)
-                Log.d("TAG","Click en contact")
+                Log.d("TAG","Click en Terms")
             }
         )
         //Spacer(modifier = Modifier.size(10.dp))
         ClickableText(
             text = contactAnnotated,
             onClick = { offset ->
-                val uri=contactAnnotated.getStringAnnotations(tag = "terms", start = offset, end = offset).firstOrNull()?.item
+                val uri=contactAnnotated.getStringAnnotations(tag = "Contact", start = offset, end = offset).firstOrNull()?.item
                 if(uri!=null)
                     uriHandler.openUri(uri)
-                Log.d("TAG","Click en terminos")
+                Log.d("TAG","Click en Contact")
             }
         )
-        Text(text = stringResource(id = R.string.settings_description))
+        Text(text = stringResource(id = R.string.settings_description1))
+        ClickableText(
+            text = whatisAnnotated,
+            onClick = { offset ->
+                val uri= whatisAnnotated.getStringAnnotations(tag = "What is", start = offset, end = offset).firstOrNull()?.item
+                if(uri!=null)
+                    uriHandler.openUri(uri)
+                Log.d("TAG","Click en What is")
+            }
+        )
+        Text(text = stringResource(id = R.string.settings_description2))
+        ClickableText(
+            text = recordsAnnotated,
+            onClick = { offset ->
+                val uri= recordsAnnotated.getStringAnnotations(tag = "Records", start = offset, end = offset).firstOrNull()?.item
+                if(uri!=null)
+                    uriHandler.openUri(uri)
+                Log.d("TAG","Click en Records")
+            }
+        )
+        Text(text = stringResource(id = R.string.settings_description3))
+        ClickableText(
+            text = rateBeautiesAnnotated,
+            onClick = { offset ->
+                val uri= rateBeautiesAnnotated.getStringAnnotations(tag = "Beauties", start = offset, end = offset).firstOrNull()?.item
+                if(uri!=null)
+                    uriHandler.openUri(uri)
+                Log.d("TAG","Click en Beauties")
+            }
+        )
     }
 }
 

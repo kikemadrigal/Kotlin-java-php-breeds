@@ -3,18 +3,14 @@ package es.tipolisto.breeds.ui.views.screens.fish
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -30,32 +26,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
-import es.tipolisto.breeds.data.models.fish.Fish
 import es.tipolisto.breeds.data.preferences.PreferenceManager
-import es.tipolisto.breeds.data.repositories.FavoritesRepository
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.FavoritesViewModel
 import es.tipolisto.breeds.ui.viewModels.FishViewModel
 import es.tipolisto.breeds.utils.Constants
-import kotlinx.coroutines.coroutineScope
-import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,8 +52,10 @@ fun DetailFishScreen(
     id:Int,
     favoritesViewModel: FavoritesViewModel
 ){
+
+    val specieFish = fishViewModel.getSpecieFishByIdFish(id)
+    if (specieFish == null) navController.navigate(AppScreens.ListFishScreen.route)
     val context= LocalContext.current
-     val specieFish = fishViewModel.getSpecieFishByIdFish(id)
     favoritesViewModel.checkIsInFavorites(specieFish?.id.toString())
     Log.d("TAG","DeltailFishScreen dice: el pez es favorito? "+favoritesViewModel.isFavorite.value)
     val isFavorite: Boolean by favoritesViewModel.isFavorite.observeAsState(initial = false)
@@ -84,7 +73,7 @@ fun DetailFishScreen(
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack,contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,contentDescription = "Back")
                         }
                     },
                     actions = {

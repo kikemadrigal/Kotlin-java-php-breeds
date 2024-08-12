@@ -31,9 +31,9 @@ class DogRepository {
         }
         fun getListDogFromBuffer()=DogProvider.listDogs
 
-        fun getRandomListDogsFromBuffer(): MutableList<DogTL?>{
+        /*fun getRandomListDogsFromBuffer(): MutableList<DogTL?>{
             var listDogs= mutableListOf<DogTL?>()
-            var dog : DogTL?=null
+            //var dog : DogTL?=null
             if(!DogProvider.listDogs.isEmpty()){
                 //Obtenemos los 3 números aleatorios diferentes
                 val setRandom= mutableSetOf<Int>()
@@ -48,7 +48,27 @@ class DogRepository {
                 Log.d("TAG3", "la lista esta vacia")
             }
             return listDogs
+        }*/
+        fun get3RandomListDogsFromBuffer(): MutableList<DogTL?>{
+            var listDogs= mutableListOf<DogTL?>()
+            if(!DogProvider.listDogs.isEmpty()){
+                //Obtenemos los 3 números aleatorios diferentes
+                val setRandom= mutableSetOf<String>()
+                //Como los et no pueden tener repetidos los metemos en un set
+                while (setRandom.size<3){
+                    val i=Random.nextInt(30)
+                    if(!setRandom.contains(DogProvider.listDogs[i].breed_id)){
+                        setRandom.add(DogProvider.listDogs[i].breed_id)
+                        listDogs.add(DogProvider.listDogs[i])
+                    }
+                }
+            }else{
+                Log.d("TAG3", "la lista esta vacia")
+            }
+            return listDogs
         }
+
+
 
         /**
          * devuelve la raza de perro a partir de su breed_id
@@ -85,13 +105,23 @@ class DogRepository {
         fun getBreedDogNameByBreedIdDog(breed_id:String?):BreedDogTL?{
             var breedDog: BreedDogTL?=null
             DogProvider.listBreedDogs.forEach {
-                val idDog = it.breed_id;
+                val idDog = it.breed_id.trim();
                 if (idDog.equals(breed_id)) breedDog = it
             }
             return breedDog
         }
+        fun getBreedDogNameByBreedId(breedId:String?):String{
+            var name=""
+            //Log.d("TAG2", "CatRepository dice: vamos a buscar el nombre del gato con el id: $id")
+            DogProvider.listBreedDogs.forEach {
+                val idDog = it.breed_id.trim()
+                if (idDog.equals(breedId))
+                    name = it.name_es
+            }
+            return name
+        }
 
-        fun getDogFromIdInBuffer(id: String):DogTL?{
+        /*fun getDogFromIdInBuffer(id: String):DogTL?{
             //Log.d("TAG", "Dogrepository dice: getDogFromIdInBuffer vamos a buscar el dog con el id: "+id)
             var dog: DogTL?=null
             DogProvider.listDogs.forEach{
@@ -103,7 +133,7 @@ class DogRepository {
                 }
             }
             return dog
-        }
+        }*/
     }//Final del cpompanion object
 
 }

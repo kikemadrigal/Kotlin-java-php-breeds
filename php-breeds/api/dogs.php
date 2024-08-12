@@ -32,7 +32,7 @@ switch($metodo){
 
 
 function select($basededatos){
-    $consulta="Select * from dog";
+    $consulta="SELECT * FROM dog WHERE creator_id=1 ";
     $resultado=$basededatos->ejecutar_sql($consulta);
 
     if($resultado){

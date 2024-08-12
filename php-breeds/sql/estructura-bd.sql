@@ -244,7 +244,10 @@ CREATE TABLE `cat` (
   `sex` tinyint,
   `address` varchar(255),
   `vaccines` int(10) DEFAULT 0,
+  `points` int(10) DEFAULT 0,
+  `total_points` int(10) DEFAULT 0,
   `path_image`varchar(255),
+  `validate` tinyint DEFAULT 0,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `creator_id` int(11),
   UNIQUE KEY `ID` (`id`),
@@ -271,7 +274,10 @@ CREATE TABLE `dog` (
   `sex` tinyint,
   `address` varchar(255),
   `vaccines` int(10) DEFAULT 0,
+  `points` int(10) DEFAULT 0,
+  `total_points` int(10) DEFAULT 0,
   `path_image` varchar(255),
+  `validate` tinyint DEFAULT 0,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `creator_id` int(11),
   UNIQUE KEY `ID` (`id`),
@@ -292,6 +298,7 @@ CREATE TABLE `fish` (
   `name_es` varchar(255),
   `specie_id` int(10),
   `path_image` varchar(255),
+  `validate` tinyint DEFAULT 0,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `creator_id` int(11),
   UNIQUE KEY `ID` (`id`),
@@ -308,7 +315,7 @@ CREATE TABLE `fish` (
 -- --------------------------------------------------------
 
 CREATE TABLE `scores` (
-  `id` int(10) NOT NULL,
+  `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   `score` int(10) DEFAULT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),

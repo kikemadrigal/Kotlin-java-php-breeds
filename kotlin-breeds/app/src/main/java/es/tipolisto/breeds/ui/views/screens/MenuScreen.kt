@@ -132,8 +132,8 @@ val itemsBottomBar= listOf(
 fun MenuScreen(navController:NavController, mediaPlayerClient: MediaPlayerClient){
     val context= LocalContext.current
     //val mediaPlayerClient by remember{ mutableStateOf(MediaPlayerClient(context))}
-    var isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
-    var isEnabledMusic by remember {mutableStateOf(PreferenceManager.readPreferenceMusicOnOff(context))}
+    val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
+    val isEnabledMusic by remember {mutableStateOf(PreferenceManager.readPreferenceMusicOnOff(context))}
     DisposableEffect(Unit) {
         if(isEnabledMusic){
             Log.d("TAG","MenuScreen dice: en disposable efect vamos a reproducirla musica")
@@ -155,6 +155,8 @@ fun MenuScreen(navController:NavController, mediaPlayerClient: MediaPlayerClient
 @Composable
 fun Menu(navController:NavController, mediaPlayerClient: MediaPlayerClient) {
     val context =LocalContext.current
+
+
     //Los objetos de tipo state son los que observa jetpack compose
     Log.d("TAG","MenuScreen dice: el valor de mediaplayer.getMusica es "+PreferenceManager.readPreferenceMusicOnOff(context))
 
@@ -163,6 +165,7 @@ fun Menu(navController:NavController, mediaPlayerClient: MediaPlayerClient) {
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -187,33 +190,39 @@ fun Menu(navController:NavController, mediaPlayerClient: MediaPlayerClient) {
             }
         }
     ) {
-        LazyColumn(
-            modifier=Modifier.padding(it).fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-            ){
-             items(itemsBottomMenu){item ->
-                 //Le ponemos un espacio entre celdas
-                 Spacer(modifier = Modifier.size(20.dp))
-                 TextButton(
-                     modifier = Modifier
-                         .width(200.dp),
-                     onClick = {
-                         mediaPlayerClient.playSound(AudioEffectsType.typeClick)
-                         navController.popBackStack()
-                         navController.navigate(item.navigation)
+
+
+
+
+
+            LazyColumn(
+                modifier=Modifier.padding(it).fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                 items(itemsBottomMenu){item ->
+                     //Le ponemos un espacio entre celdas
+                     Spacer(modifier = Modifier.size(20.dp))
+                     TextButton(
+                         modifier = Modifier
+                             .width(200.dp),
+                         onClick = {
+                             mediaPlayerClient.playSound(AudioEffectsType.typeClick)
+                             navController.popBackStack()
+                             navController.navigate(item.navigation)
+                         }
+                     ) {
+                         Image(
+                             painter = painterResource(id = item.image),
+                             contentDescription = "Breeds",
+                             Modifier
+                                 .fillMaxSize(),
+                             contentScale = ContentScale.FillWidth
+                         )
                      }
-                 ) {
-                     Image(
-                         painter = painterResource(id = item.image),
-                         contentDescription = "Breeds",
-                         Modifier
-                             .fillMaxSize(),
-                         contentScale = ContentScale.FillWidth
-                     )
                  }
-             }
-        }
+            }
+
     }//Final del scafold body
 }//Final función
 

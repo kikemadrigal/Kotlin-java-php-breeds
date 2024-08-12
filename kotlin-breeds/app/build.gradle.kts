@@ -12,8 +12,8 @@ android {
         applicationId = "es.tipolisto.breeds"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -62,9 +62,13 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    // PERMISOS
+    implementation("com.google.accompanist:accompanist-permissions:0.28.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     //CameraX:https://developer.android.com/jetpack/androidx/releases/camera?hl=es-419
     // CameraX core library using the camera2 implementation
-    val camerax_version = "1.4.0-alpha04"
+    //val camerax_version = "1.4.0-alpha04"
+    val camerax_version = "1.4.0-beta02"
     // The following line is optional, as the core library is included indirectly by camera-camera2
     implementation("androidx.camera:camera-core:${camerax_version}")
     implementation("androidx.camera:camera-camera2:${camerax_version}")
@@ -78,10 +82,12 @@ dependencies {
     //implementation("androidx.camera:camera-mlkit-vision:${camerax_version}")
     // If you want to additionally use the CameraX Extensions library
     implementation("androidx.camera:camera-extensions:${camerax_version}")
+    //Para recortar la imagen del animal en beauties
+    //implementation("com.vanniktech:android-image-cropper:4.6.0")
 
     //LiveData para engancharse desde el composable screen al viewModel
     //Si no lo pones, esto no los puedes hacer: val email: String by loginViewModel.email.observeAsState(initial = "")
-    implementation ("androidx.compose.runtime:runtime-livedata:1.6.3")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.8")
     //Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")

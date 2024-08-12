@@ -6,7 +6,7 @@ import es.tipolisto.breeds.data.models.fish.FishTL
 
 data class FishScreenState(
     val listRandomFish: MutableList<FishTL?> = mutableListOf(null, null, null),
-    var lives:Int=5,
+    var lives:Int=7,
     var score:Int=0,
     var correctAnswer:Int=0
 )

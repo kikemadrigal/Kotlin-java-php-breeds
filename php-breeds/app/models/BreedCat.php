@@ -387,7 +387,7 @@ Class BreedCat {
 	/**
 	 * TODTRING
 	 */
-	function to_String(){
+	function to_string(){
 		$path=$this->path_image;
 		$order   = array("\\", "\\\\", "\\\\\\");
 		$path=str_replace($order,"/",$path);

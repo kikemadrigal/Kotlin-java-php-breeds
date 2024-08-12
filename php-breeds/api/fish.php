@@ -26,7 +26,7 @@ switch($metodo){
 
 function consultaSelect($basededatos){
     $basededatos->conectar_mysql();
-    $consulta="Select * from breed_cat";
+    $consulta="Select * from fish where creator_id=1";
     $resultado=$basededatos->ejecutar_sql($consulta);
 
     if($resultado){

@@ -19,7 +19,10 @@ class DogRepository{
 		$dog->set_sex($linea['sex']);
 		$dog->set_address($linea['address']);
 		$dog->set_vaccines($linea['vaccines']);
+		$dog->set_points($linea['points']);
+		$dog->set_total_points($linea['total_points']);
 		$dog->set_path_image($linea['path_image']);
+		$dog->set_validate($linea['validate']);
 		$dog->set_date($linea['date']);
 		$dog->set_creator_id($linea['creator_id']);
 		return $dog;
@@ -54,18 +57,6 @@ class DogRepository{
 		}
 		$basededatos->desconectar();
 	}
-	public static function getAuthorById($id){
-		$basededatos= new MysqliClient();
-		$basededatos->conectar_mysql();
-		$consulta  = "SELECT author FROM games WHERE id='$id' ";
-		$resultado=$basededatos->ejecutar_sql($consulta);
-		while ($linea = mysqli_fetch_array($resultado)) 
-		{
-			return $linea['author'];
-		}
-		$basededatos->desconectar();
-	}
-
 
 	public static function getRandom(){
 		$dog=null;
@@ -92,6 +83,37 @@ class DogRepository{
 		$basededatos= new MysqliClient();
 		$basededatos->conectar_mysql();
 		$consulta  = "SELECT * FROM dog ORDER BY id LIMIT ".$init.", 10";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$dog=self::asignarElementos($linea);
+			$dogs[]=$dog;
+		}
+		$basededatos->desconectar();
+		return $dogs;
+	}
+
+	public static function getRanking($init){
+		$dogs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM dog ORDER BY total_points DESC LIMIT ".$init.", 10";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		if(is_null($resultado))echo "resultado es null";
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$dog=self::asignarElementos($linea);
+			$dogs[]=$dog;
+		}
+		$basededatos->desconectar();
+		return $dogs;
+	}
+	public static function getMax3Beauties(){
+		$dogs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM dog ORDER BY total_points DESC LIMIT 3";
 		$resultado=$basededatos->ejecutar_sql($consulta);
 		if(is_null($resultado))echo "resultado es null";
 		while ($linea = mysqli_fetch_array($resultado)) 
@@ -133,11 +155,11 @@ class DogRepository{
 	}
 	
 
-	public static function getAllByUser($idUser, $start, $end){
+	public static function getAllByUser($idUser, $init){
 		$dogs=array();
 		$basededatos= new MysqliClient();
 		$basededatos->conectar_mysql();
-		$consulta  = "SELECT * FROM dog WHERE creator_id='".$idUser."' limit ".$start .", ".$end."";
+		$consulta  = "SELECT * FROM dog WHERE creator_id='".$idUser."' LIMIT ".$init.", 10";
 		$resultado=$basededatos->ejecutar_sql($consulta);
 		while ($linea = mysqli_fetch_array($resultado)) 
 		{
@@ -147,7 +169,20 @@ class DogRepository{
 		$basededatos->desconectar();
 		return $dogs;
 	}
-
+	public static function getLastFive(){
+		$dogs=array();
+		$basededatos= new MysqliClient();
+		$basededatos->conectar_mysql();
+		$consulta  = "SELECT * FROM dog ORDER BY id DESC LIMIT 5";
+		$resultado=$basededatos->ejecutar_sql($consulta);
+		while ($linea = mysqli_fetch_array($resultado)) 
+		{
+			$dog=self::asignarElementos($linea);
+			$dogs[]=$dog;
+		}
+		$basededatos->desconectar();
+		return $dogs;
+	}
 
 
 	/*
@@ -171,7 +206,10 @@ class DogRepository{
 			.$dog->get_sex()."', '"
 			.$dog->get_address()."', '"
 			.$dog->get_vaccines()."', '"
+			.$dog->get_points()."', '"
+			.$dog->get_total_points()."', '"
 			.$dog->get_path_image()."', '"
+			.$dog->get_validate()."', '"
 			.$dog->get_date()."', '"
 			.$dog->get_creator_id()."', '"
 			."') ";		
@@ -208,8 +246,14 @@ class DogRepository{
 			.$dog->get_address()
 			."', vaccines='"
 			.$dog->get_vaccines()
+			."', points='"
+			.$dog->get_points()
+			."', total_points='"
+			.$dog->get_total_points()
 			."', path_image='"
 			.$dog->get_path_image()
+			."', validate='"
+			.$dog->get_validate()
 			."', date='"
 			.$dog->get_date()
 			."', creator_id='"
@@ -218,6 +262,23 @@ class DogRepository{
         $bd->ejecutar_sql($sql);
         $bd->desconectar();
     }
+
+
+	public static function updateBeauty($id_dog, $new_points){
+		$dog=self::getById($id_dog);
+		$total_points=$dog->get_total_points();
+		$total_points++;
+		$points=$new_points/$total_points;	
+		$bd= new MysqliClient();
+        $bd->conectar_mysql();
+		$sql="update dog set points='"
+		.$points
+		."', total_points='"
+		.$total_points
+		."' WHERE id='".$id_dog."'";
+		$bd->ejecutar_sql($sql);
+        $bd->desconectar();
+	}
 
 	public static function delete($id){
         $bd= new MysqliClient();
