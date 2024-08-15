@@ -78,4 +78,5 @@
     <string name="the_image_already_exists_in_your_account_it_has_not_been_saved">The image already exists in your account, it has not been saved</string>
     <string name="records_view_internet_records">View internet records</string>
     <string name="login">Login</string>
+    <string name="there_was_a_problem_getting_the_data">There was a problem getting the data</string>
 </resources>

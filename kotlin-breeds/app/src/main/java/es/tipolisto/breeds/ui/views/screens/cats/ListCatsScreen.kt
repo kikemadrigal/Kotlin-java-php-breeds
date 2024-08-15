@@ -3,6 +3,7 @@
 package es.tipolisto.breeds.ui.views.screens.cats
 
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,8 +72,13 @@ fun ListCatsScreen(navController:NavController,catsViewModel:CatsViewModel) {
                 )
             }
         ) {
-            if(catsViewModel.getAllBreedsCats().isEmpty())
+            if(catsViewModel.getAllBreedsCats().isEmpty()){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),
+                    Toast.LENGTH_LONG).show()
+                navController.popBackStack()
                 navController.navigate(AppScreens.SplashScreen.route)
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .padding(it)
@@ -128,8 +134,8 @@ fun ListIntemRow(breedCat: BreedCatTL, navController: NavController){
 @Composable
 fun CatImage(breedCat: BreedCatTL){
     //Image(painter= rememberAsyncImagePainter(request="https://loremflickr.com/100/100"), contentDescription = null )
-    var url=Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat.path_image
-    var model by remember { mutableStateOf(url) }
+    val url=Constants.URL_BASE_IMAGES_TIPOLISTO_ES+breedCat.path_image
+    val model by remember { mutableStateOf(url) }
     AsyncImage(
         model = model,
         contentDescription = "Select a breed",

@@ -41,9 +41,6 @@ class DogsViewModel(private val recordDao: RecordDao): ViewModel() {
         state.lives=7
         state.score=0
     }
-    fun getAllBreedsDogs():List<BreedDogTL>{
-        return DogProvider.listBreedDogs
-    }
 
     fun get3RamdomDogs(){
         viewModelScope.launch {
@@ -94,6 +91,13 @@ class DogsViewModel(private val recordDao: RecordDao): ViewModel() {
     fun getBreedDogById(id:Int):BreedDogTL?{
         Log.d("TAG", "DogViewModel dice: Vamos a ver hay un gato con este breed id "+id)
         return DogRepository.getBreedDogByIdFromBuffer(id)
+    }
+
+    fun getAllBreedsDogs():List<BreedDogTL>{
+        return DogRepository.getListBreedsDogFromBuffer()
+    }
+    fun getAllDogs():List<DogTL>{
+        return DogRepository.getListDogFromBuffer()
     }
 
 }

@@ -1,35 +1,45 @@
 package es.tipolisto.breeds.data.repositories
 
 import android.util.Log
-import es.tipolisto.breeds.data.models.cat.Cat
-import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.models.dog.BreedDogTL
-import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.models.dog.DogTL
-import es.tipolisto.breeds.data.models.dog.ImageDog
 import es.tipolisto.breeds.data.network.RetrofitClient
-import es.tipolisto.breeds.data.providers.CatProvider
 import es.tipolisto.breeds.data.providers.DogProvider
 import kotlin.random.Random
 
 class DogRepository {
     companion object{
         suspend fun loadDogAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitService()
-            val response=service.getListDogs()
-            val listBreedsDog =response.body()
-            if(listBreedsDog!!.isEmpty()) Log.d("TAG", "Lista vacía")
-            else{
-                DogProvider.listDogs=listBreedsDog
+            try {
+                val service= RetrofitClient.getRetrofitService()
+                val response = service.getListDogs()
+                val listBreedsDog = response.body()
+                if (listBreedsDog == null) Log.d("TAG", "Lista vacía")
+                else {
+                    DogProvider.listDogs = listBreedsDog
+                }
+            //}catch (e:IllegalStateException){
+            }catch (e:Exception){
+                Log.d("TAG", "loadBreedDogsAndInsertBuffer: "+e.message)
             }
+
         }
         suspend fun loadBreedDogsAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitService()
-            val response=service.getAllBreedDogs()
-            val listBreedsDogs=response.body()
-            if (listBreedsDogs != null) DogProvider.listBreedDogs=listBreedsDogs
+            try {
+                val service= RetrofitClient.getRetrofitService()
+                val response = service.getAllBreedDogs()
+                val listBreedsDogs = response.body()
+                if (listBreedsDogs != null) DogProvider.listBreedDogs = listBreedsDogs
+            //}catch (e:IllegalStateException){
+            }catch (e:Exception){
+                Log.d("TAG", "loadBreedDogsAndInsertBuffer: "+e.message)
+            }
+
+
+
         }
         fun getListDogFromBuffer()=DogProvider.listDogs
+        fun getListBreedsDogFromBuffer()=DogProvider.listBreedDogs
 
         /*fun getRandomListDogsFromBuffer(): MutableList<DogTL?>{
             var listDogs= mutableListOf<DogTL?>()
@@ -50,8 +60,8 @@ class DogRepository {
             return listDogs
         }*/
         fun get3RandomListDogsFromBuffer(): MutableList<DogTL?>{
-            var listDogs= mutableListOf<DogTL?>()
-            if(!DogProvider.listDogs.isEmpty()){
+            val listDogs= mutableListOf<DogTL?>()
+            if(DogProvider.listDogs.isNotEmpty()){
                 //Obtenemos los 3 números aleatorios diferentes
                 val setRandom= mutableSetOf<String>()
                 //Como los et no pueden tener repetidos los metemos en un set

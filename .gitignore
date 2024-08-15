@@ -30,6 +30,7 @@ kotlin-breeds/.idea/assetWizardSettings.xml
 kotlin-breeds/build
 kotlin-breeds/captures
 kotlin-breeds/local.properties
+kotlin-breeds/protected
 
 
 #java-ConsumoAPI
@@ -41,6 +42,7 @@ kotlin-breeds/local.properties
 ./php-breeds/.vscode/ftp-sync.json
 ./php-breeds/app/config/env.php
 ./php-breeds/protected/
+./php-breeds/secrets/
 
 
 

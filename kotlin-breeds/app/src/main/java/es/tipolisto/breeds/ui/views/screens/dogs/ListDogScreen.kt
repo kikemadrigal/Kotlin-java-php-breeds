@@ -3,6 +3,7 @@
 package es.tipolisto.breeds.ui.views.screens.dogs
 
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,8 +72,13 @@ fun ListDogScreen(navController:NavController, dogsViewModel: DogsViewModel) {
                 )
             }
         ) {
-            if(dogsViewModel.getAllBreedsDogs().isEmpty())
+            if(dogsViewModel.getAllBreedsDogs().isEmpty()){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),
+                    Toast.LENGTH_LONG).show()
+                navController.popBackStack()
                 navController.navigate(AppScreens.SplashScreen.route)
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .padding(it)

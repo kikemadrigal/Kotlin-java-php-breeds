@@ -43,12 +43,14 @@ class MainActivity : ComponentActivity() {
     val dogsViewModel: DogsViewModel by viewModels()
     val loginViewModel:LoginViewModel by viewModels()*/
     val beautyViewModel: BeautyViewModel by viewModels()
+    private var mediaPlayerClient:MediaPlayerClient?=null
+
     //val showinDialogNotInternet:Boolean=false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //val mediaPlayerClient=MediaPlayerClient( applicationContext )
-
+        mediaPlayerClient=MediaPlayerClient( applicationContext )
         //val fishViewModel: FishViewModel by viewModels()
         //val dogsViewModel: DogsViewModel by viewModels()
         //val loginViewModel:LoginViewModel by viewModels()
@@ -79,7 +81,6 @@ class MainActivity : ComponentActivity() {
                     Log.d("TAG","Main activity dice: el estado de internet es "+showAlertDialog.value)
                     //Si no se muestra el alertdialog es que hay intenet y se puede navegar
                     if(!showAlertDialog.value){
-                        val mediaPlayerClient=MediaPlayerClient( applicationContext )
                         //1. Obtenemos los records
                         val recordsDao=AppDataBaseClient.getRecordsDao(applicationContext)
                         val recordsViewModel=RecordsViewModel(recordsDao)
@@ -96,24 +97,39 @@ class MainActivity : ComponentActivity() {
                         //3.Inicializamos el sonido
                         //val mediaPlayerClient=MediaPlayerClient(applicationContext)
                         //4.Inicializamos la navegación
-                        AppNavigation(
-                            catsViewModel,
-                            dogsViewModel,
-                            fishViewModel,
-                            competitionViewModel,
-                            favoritesViewModel,
-                            recordsViewModel,
-                            loginViewModel,
-                            beautyViewModel,
-                            mediaPlayerClient
-                        )
+                        if(mediaPlayerClient!=null){
+                            AppNavigation(
+                                catsViewModel,
+                                dogsViewModel,
+                                fishViewModel,
+                                competitionViewModel,
+                                favoritesViewModel,
+                                recordsViewModel,
+                                loginViewModel,
+                                beautyViewModel,
+                                mediaPlayerClient!!
+                            )
+                        }
+
                     }
                }
             }
         }
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        if(mediaPlayerClient!=null){
+            //if(PreferenceManager.readPreferenceMusicOnOff(applicationContext))
+                //mediaPlayerClient?.playMenuMusic()
+        }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        mediaPlayerClient?.stopMenuMusic()
+        mediaPlayerClient?.stopInGameMusic()
+    }
 /*
     private fun getRecords(recordsViewModel: RecordsViewModel, recordDao:RecordDao) {
         lifecycleScope.launch {

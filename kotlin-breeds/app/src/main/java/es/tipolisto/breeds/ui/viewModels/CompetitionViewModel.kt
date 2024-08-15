@@ -58,9 +58,7 @@ class CompetitionViewModel(private val recordDao:RecordDao): ViewModel() {
         state.score=0
     }
 
-    fun getAllBreedsCats():List<BreedCatTL>{
-        return CatProvider.listBreedCats
-    }
+
     fun get3Ramdom(){
         viewModelScope.launch {
             if (clickPressed)delay(2000)
@@ -123,7 +121,24 @@ class CompetitionViewModel(private val recordDao:RecordDao): ViewModel() {
             }
         }
     }
-
+      fun getAllCats():List<CatTL>{
+          return CatRepository.getListCatsFromBuffer()
+      }
+    fun getAllBreedsCats():List<BreedCatTL>{
+        return CatProvider.listBreedCats
+    }
+    fun getAllDogs():List<DogTL>{
+        return DogRepository.getListDogFromBuffer()
+    }
+    fun getAllBreedsDogs():List<DogTL>{
+        return DogRepository.getListDogFromBuffer()
+    }
+    fun getAllFish():List<FishTL>{
+        return FishRepository.getListFishFromBuffer()
+    }
+    fun getSpecieFish():List<FishTL>{
+        return FishRepository.getListFishFromBuffer()
+    }
     /*fun getNameAnimalById(id:Int):String?{
         var cat:CatTL?=null
         var dog:DogTL?=null

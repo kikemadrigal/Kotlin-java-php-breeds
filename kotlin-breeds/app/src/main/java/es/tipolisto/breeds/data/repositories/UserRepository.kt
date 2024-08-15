@@ -13,9 +13,12 @@ class UserRepository {
             var message:String?="";
             if(name!=null && password!=null){
                 val service= RetrofitClient.getRetrofitService()
+
                 val response=service.saveScore(name, password, score)
                 message=response.body()
                 Log.d("TAG3", "mensaje: "+message.toString())
+
+
             }else{
                 Log.d("TAG3", "mensaje: algo es null")
             }
@@ -24,8 +27,8 @@ class UserRepository {
         suspend fun checkUser(name: String?, password: String?):String {
             var message:String?="";
             Log.d("TAG3", "El usuario es $name y la contraseña es $password")
+            val service= RetrofitClient.getRetrofitService()
             if(name!=null && password!=null){
-                val service= RetrofitClient.getRetrofitService()
                 val response=service.checkUser(name, password)
                 message=response.body()
                 Log.d("TAG3", "mensaje: "+message.toString())

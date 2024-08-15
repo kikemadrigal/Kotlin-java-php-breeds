@@ -123,7 +123,11 @@ fun DetailCatScreen(
 
         ) {
             val breedCat = catsViewModel.getBreedCatById(idCat)
-            if (breedCat == null) navController.navigate(AppScreens.ListCatsScreen.route)
+            if (breedCat == null) {
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
+                navController.navigate(AppScreens.ListCatsScreen.route)
+            }
              Card(
                 modifier = Modifier
                     .padding(it)

@@ -38,6 +38,7 @@ function consultaSelect($basededatos){
     }
     $basededatos->desconectar();
     echo json_encode($BreedCat);
+    //echo json_encode("Hola");
 }
 
 

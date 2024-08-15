@@ -46,7 +46,24 @@ fun onBackPressed(onDismiss:()->Unit,navController: NavController, context: Cont
     val dialog: Dialog = builder.create()
     dialog.show()
 }
+@Composable
+fun MiAlertDialog(message:String, onConfirm: () -> Unit){
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(text = "Error") },
+        text = { Text(text = message) },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                }
+            ) {
+                Text("Confirm")
+            }
 
+        }
+    )
+}
 @Composable
 fun MyAlertDialogNewRecord(show:Boolean, onDismiss:()->Unit, onConfirm:(name:String)->Unit){
     var name by remember {mutableStateOf("")}

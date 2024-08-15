@@ -129,8 +129,12 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, r
                 )
             }
         ) {
-            if(fishViewModel.getAllSpeciesFish().isEmpty())
+            if(fishViewModel.getAllFish().isEmpty() || fishViewModel.getAllSpeciesFish().isEmpty()){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
                 navController.navigate(AppScreens.SplashScreen.route)
+            }
+
             GameFishScreenContent(it, fishViewModel, recordsViewModel,navController, mediaPlayerClient)
         }
     }

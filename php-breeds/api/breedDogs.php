@@ -44,5 +44,7 @@ function select($basededatos){
     }
     $basededatos->desconectar();
     echo json_encode($breedDogs);
+    //$test=[];
+    //echo json_encode("hola mundo");
 }
 

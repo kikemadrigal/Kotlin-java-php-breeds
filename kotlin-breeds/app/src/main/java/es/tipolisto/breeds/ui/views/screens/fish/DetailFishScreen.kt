@@ -110,6 +110,11 @@ fun DetailFishScreen(
             }
         ) {
             val specieFish = fishViewModel.getSpecieFishByIdFish(id)
+            if(specieFish==null){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
+                navController.navigate(AppScreens.ListFishScreen.route)
+            }
             val url = Constants.URL_BASE_IMAGES_TIPOLISTO_ES+specieFish?.path_image
             val model by remember { mutableStateOf(url) }
             Card(

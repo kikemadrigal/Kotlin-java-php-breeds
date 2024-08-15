@@ -37,9 +37,6 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
         state.score=0
     }
 
-    fun getAllBreedsCats():List<BreedCatTL>{
-        return CatProvider.listBreedCats
-    }
 
     /**
      * Este método asigna los valores a state.listRandomCats y a state.correctAnswer
@@ -84,6 +81,13 @@ class CatsViewModel(private val recordDao:RecordDao): ViewModel() {
 
     fun getBreedCatById(id:Int):BreedCatTL?{
         return CatRepository.getBreedCatByIdFromBuffer(id)
+    }
+
+    fun getAllBreedsCats():List<BreedCatTL>{
+        return CatRepository.getListBreedsCatsFromBuffer()
+    }
+    fun getAllCats():List<CatTL>{
+        return CatRepository.getListCatsFromBuffer()
     }
 }
 

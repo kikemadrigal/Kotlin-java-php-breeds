@@ -55,6 +55,7 @@ import coil.compose.SubcomposeAsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.preferences.PreferenceManager
 import es.tipolisto.breeds.data.repositories.DogRepository
+import es.tipolisto.breeds.ui.components.MiAlertDialog
 import es.tipolisto.breeds.ui.components.MyAlertDialogNewRecord
 import es.tipolisto.breeds.ui.components.MyCircularProgressIndicator
 import es.tipolisto.breeds.ui.components.onBackPressed
@@ -121,8 +122,13 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, re
                 )
             }
         ) {
-            if(dogsViewModel.getAllBreedsDogs().isEmpty())
+            if(dogsViewModel.getAllDogs().isEmpty() || dogsViewModel.getAllBreedsDogs().isEmpty()){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
                 navController.navigate(AppScreens.SplashScreen.route)
+            }
+
+
             GameDogScreenContent(it, dogsViewModel, recordsViewModel, navController, mediaPlayerClient)
         }
     }

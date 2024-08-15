@@ -23,7 +23,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface IApiService {
-
+    @GET("test.php")
+    suspend fun test(): Response<List<CatTL>>
 
     /*
    Json de https://breeds.tipolisto.es/api/breedCats.php
@@ -141,7 +142,7 @@ interface IApiService {
     suspend fun getAllBreedDogs(): Response<List<BreedDogTL>>
 
     @GET("dogs.php")
-    suspend fun getListDogs():Response<List<DogTL>>
+    suspend fun getListDogs():Response<List<DogTL>?>
 
 
     //Devuelve una imagen de un perro a partir del breed_id

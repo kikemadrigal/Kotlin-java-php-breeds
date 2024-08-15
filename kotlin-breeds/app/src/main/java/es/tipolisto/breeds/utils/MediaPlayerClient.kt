@@ -20,7 +20,7 @@ class MediaPlayerClient (private val context: Context) {
         menuMusic.isLooping=true
     }
     fun playSound(effectsType: AudioEffectsType){
-        var effects:MediaPlayer
+        val effects:MediaPlayer
         when(effectsType.name){
             "click"-> effects=MediaPlayer.create(context, R.raw.clickbutton)
             "success"-> effects = MediaPlayer.create(context, R.raw.success)
@@ -43,12 +43,16 @@ class MediaPlayerClient (private val context: Context) {
     }*/
     fun playInGameMusic(){
         inGameMusic = MediaPlayer.create(context, R.raw.ingame)
-        if(!inGameMusic.isPlaying)inGameMusic.start()
+        if(!inGameMusic.isPlaying){
+            inGameMusic.start()
+            inGameMusic.setLooping(true)
+        }
     }
 
     fun stopInGameMusic(){
         if(inGameMusic.isPlaying)inGameMusic.stop()
     }
+
 
     fun playMenuMusic(){
         menuMusic= MediaPlayer.create(context, R.raw.intro)
@@ -57,6 +61,8 @@ class MediaPlayerClient (private val context: Context) {
         if(!menuMusic.isPlaying){
             //menuMusic.reset()
             menuMusic.start()
+            menuMusic.setLooping(true)
+
             //Log.d("TAG","MediaPlayerClient dice: reproduciendo musica menu")
         }
     }

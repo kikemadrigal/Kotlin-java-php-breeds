@@ -11,28 +11,41 @@ class CatRepository {
     companion object{
 
         suspend fun loadCatsAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitService()
-            val response=service.getAllCats()
-            val listCats=response.body()
-            if (listCats != null) CatProvider.listCats=listCats
+            try {
+                val service= RetrofitClient.getRetrofitService()
+                val response=service.getAllCats()
+                val listCats=response.body()
+                if (listCats != null) CatProvider.listCats=listCats
+            //}catch (e:IllegalStateException){
+            }catch (e:Exception){
+                Log.d("TAG", "loadCatsAndInsertBuffer: "+e.message)
+            }
+
         }
         suspend fun loadBreedCatsAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitService()
-            val response=service.getAllBreedCats()
-            val listBreedsCats=response.body()
-            if (listBreedsCats != null) CatProvider.listBreedCats=listBreedsCats
+            try {
+                val service= RetrofitClient.getRetrofitService()
+                val response=service.getAllBreedCats()
+                val listBreedsCats=response.body()
+                if (listBreedsCats != null) CatProvider.listBreedCats=listBreedsCats
+            //}catch (e:IllegalStateException){
+            }catch (e:Exception){
+                Log.d("TAG", "loadBreedCatsAndInsertBuffer: "+e.message)
+            }
+
         }
 
         fun getListCatsFromBuffer()=CatProvider.listCats
+        fun getListBreedsCatsFromBuffer()=CatProvider.listBreedCats
 
         fun getList3RandomCatsFromBuffer(): MutableList<CatTL?>{
-            var listCats= mutableListOf<CatTL?>()
-            if(!CatProvider.listCats.isEmpty()){
+            val listCats= mutableListOf<CatTL?>()
+            if(CatProvider.listCats.isNotEmpty()){
                 //Obtenemos los 3 números aleatorios diferentes
                 val setRandom= mutableSetOf<String>()
                 //Como los et no pueden tener repetidos los metemos en un set
                 while (setRandom.size<3){
-                    var i=Random.nextInt(CatProvider.listCats.size)
+                    val i=Random.nextInt(CatProvider.listCats.size)
                     if(!setRandom.contains(CatProvider.listCats[i].breed_id)){
                         setRandom.add(CatProvider.listCats[i].breed_id)
                         listCats.add(CatProvider.listCats[i])

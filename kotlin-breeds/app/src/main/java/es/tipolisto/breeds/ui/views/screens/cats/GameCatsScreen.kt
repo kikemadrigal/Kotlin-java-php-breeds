@@ -85,13 +85,7 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
     }
     //Conrol del botón atrás
     BackHandler{
-        onBackPressed(
-            {
-                catsViewModel.initGame()
-            }
-            ,navController,
-            context
-        )
+        onBackPressed( { catsViewModel.initGame()} ,navController, context)
     }
 
     val isDarkMode by remember {mutableStateOf(PreferenceManager.readPreferenceThemeDarkOnOff(context))}
@@ -136,8 +130,11 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
                 )
             }
         ){
-            if(catsViewModel.getAllBreedsCats().isEmpty())
+            if(catsViewModel.getAllCats().isEmpty() || catsViewModel.getAllBreedsCats().isEmpty() ){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
                 navController.navigate(AppScreens.SplashScreen.route)
+            }
             GameCatScreenContent(it,catsViewModel,recordsViewModel, navController,mediaPlayerClient)
         }
     }
@@ -290,7 +287,7 @@ fun CatTest(catsViewModel: CatsViewModel, mediaPlayerClient: MediaPlayerClient){
         ){
             val breedCat=catsViewModel.state.listRandomCats[i]?.breed_id
             val breedCatName=CatRepository.getBreedCatNameByIdCat(breedCat)
-            var text=(i+1).toString()+")  "+ breedCatName+"."
+            val text=(i+1).toString()+")  "+ breedCatName+"."
             if(catsViewModel.clickPressed){
                 Text(
                     text = text,

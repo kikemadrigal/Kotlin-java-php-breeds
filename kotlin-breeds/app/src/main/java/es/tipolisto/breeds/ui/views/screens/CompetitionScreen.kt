@@ -117,6 +117,16 @@ fun CompetitionScreen(navController: NavController, competitionViewModel:Competi
                 )
             }
         ){
+            if(competitionViewModel.getAllCats().isEmpty() ||
+                competitionViewModel.getAllBreedsCats().isEmpty() ||
+                competitionViewModel.getAllDogs().isEmpty() ||
+                competitionViewModel.getAllBreedsDogs().isEmpty() ||
+                competitionViewModel.getAllFish().isEmpty() ||
+                competitionViewModel.getSpecieFish().isEmpty()){
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
+                navController.navigate(AppScreens.SplashScreen.route)
+            }
             GameCompetitionScreenContent(it,competitionViewModel,recordsViewModel, navController,mediaPlayerClient)
         }
     }

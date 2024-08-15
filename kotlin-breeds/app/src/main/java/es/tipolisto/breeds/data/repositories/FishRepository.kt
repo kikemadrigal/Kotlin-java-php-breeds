@@ -16,8 +16,8 @@ import kotlin.random.Random
 class FishRepository {
     companion object {
         suspend fun loadFishAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitService()
             try {
+                val service= RetrofitClient.getRetrofitService()
                 val response=service.getAllFish()
                 val listFish=response.body()
                 if(listFish!=null)
@@ -25,10 +25,12 @@ class FishRepository {
             }catch (ex: Exception){
                 Log.d("TAG", "Excepción en "+ex)
             }
+
+
         }
         suspend fun loadSpecieFishAndInsertBuffer() {
-            val service= RetrofitClient.getRetrofitService()
             try {
+                val service= RetrofitClient.getRetrofitService()
                 val response=service.getAllSpecieFish()
                 val listSpecieFish=response.body()
                 if(listSpecieFish!=null)
@@ -38,7 +40,8 @@ class FishRepository {
             }
         }
 
-
+        fun getListFishFromBuffer()=FishProvider.listFish
+        fun getSpecieFishFromBuffer()=FishProvider.listSpecieFish
         /*fun get3RandomListFishFromBuffer(): MutableList<FishTL?>{
             var listFish= mutableListOf<FishTL?>()
             var fish : FishTL?=null
@@ -60,7 +63,7 @@ class FishRepository {
 
         fun get3RandomListFishFromBuffer(): MutableList<FishTL?>{
             var listFish= mutableListOf<FishTL?>()
-            if(!FishProvider.listFish.isEmpty()){
+            if(FishProvider.listFish.isNotEmpty()){
                 //Obtenemos los 3 números aleatorios diferentes
                 val setRandom= mutableSetOf<Int>()
                 //Como los et no pueden tener repetidos los metemos en un set

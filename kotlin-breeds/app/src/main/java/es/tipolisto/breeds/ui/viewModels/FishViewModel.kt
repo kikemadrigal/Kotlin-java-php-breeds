@@ -43,9 +43,7 @@ class FishViewModel(private val recordDao: RecordDao): ViewModel() {
         state.lives=7
         state.score=0
     }
-    fun getAllSpeciesFish():List<SpecieFishTL>{
-        return FishProvider.listSpecieFish
-    }
+
     fun get3RamdomFish(){
         viewModelScope.launch {
             if (clickPressed) delay(2000)
@@ -95,6 +93,11 @@ class FishViewModel(private val recordDao: RecordDao): ViewModel() {
         Log.d("TAG", "FishViewModel dice: Vamos a ver hay un gato con este breed id "+id)
         return FishRepository.getSpecieFishFromSpecieIdInBuffer(id)
     }
-
+    fun getAllSpeciesFish():List<SpecieFishTL>{
+        return FishRepository.getSpecieFishFromBuffer()
+    }
+    fun getAllFish():List<FishTL>{
+        return FishRepository.getListFishFromBuffer()
+    }
 
 }

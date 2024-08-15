@@ -63,6 +63,7 @@ interface IFishApiService {
         },
 
      */
+    /*
     @GET("fishes")
     //@GET("fish/Tarpon")
     @Headers("X-RapidAPI-Key: ${Constants.KEY_API_FISH}" ,"X-RapidAPI-Host: fish-species.p.rapidapi.com")
@@ -70,4 +71,5 @@ interface IFishApiService {
 
     @GET("fish/{name}")
     suspend fun getImageFish(@Path("name") name:String): Response<Fish>
+    */
 }

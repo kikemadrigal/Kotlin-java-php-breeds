@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import es.tipolisto.breeds.R
 import es.tipolisto.breeds.data.models.dog.BreedDogTL
 import es.tipolisto.breeds.data.preferences.PreferenceManager
+import es.tipolisto.breeds.ui.components.MiAlertDialog
 import es.tipolisto.breeds.ui.navigation.AppScreens
 import es.tipolisto.breeds.ui.theme.BreedsTheme
 import es.tipolisto.breeds.ui.viewModels.DogsViewModel
@@ -110,7 +111,11 @@ fun DetailDogScreen(
             }
         ) {
             val breedDog = dogsViewModel.getBreedDogById(id)
-            if (breedDog == null) navController.navigate(AppScreens.ListDogsScreen.route)
+            if (breedDog == null) {
+                Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
+                navController.popBackStack()
+                navController.navigate(AppScreens.ListDogsScreen.route)
+            }
             val url=breedDog?.path_image
             val model by remember { mutableStateOf(url) }
             Card(

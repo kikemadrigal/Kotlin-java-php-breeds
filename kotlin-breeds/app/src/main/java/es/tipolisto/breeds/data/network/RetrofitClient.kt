@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import es.tipolisto.breeds.data.models.dog.Dog
 import es.tipolisto.breeds.data.models.fish.Fish
 import es.tipolisto.breeds.utils.Constants
+import org.json.JSONException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 //import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -22,7 +23,8 @@ class RetrofitClient{
             val gson = GsonBuilder()
                 .create()
             val retrofit=createRetrofit(Constants.URL_BASE,gson)
-            return retrofit.create(IApiService::class.java)
+            val api = retrofit.create(IApiService::class.java)
+            return api
         }
         // .addConverterFactory(ScalarsConverterFactory.create())
         /*fun getRetrofitCatService():ICatApiService{

@@ -202,6 +202,7 @@ fun Texts(){
                 Log.d("TAG","Click en Contact")
             }
         )
+        Text(text = "Developed by: Tipolisto.es\nMusic by: Clemente Tiñena")
         Text(text = stringResource(id = R.string.settings_description1))
         ClickableText(
             text = whatisAnnotated,
