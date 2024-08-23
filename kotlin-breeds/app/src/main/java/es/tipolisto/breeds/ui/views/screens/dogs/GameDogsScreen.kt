@@ -74,8 +74,10 @@ fun GameDogScreen(navController: NavController, dogsViewModel: DogsViewModel, re
 
     LaunchedEffect(key1 = true) {
         if (!dogsViewModel.justOnce) {
-            dogsViewModel.get3RamdomDogs()
-            dogsViewModel.justOnce = true
+            if (dogsViewModel.getAllDogs().isNotEmpty() && dogsViewModel.getAllBreedsDogs().isNotEmpty()) {
+                dogsViewModel.get3RamdomDogs()
+                dogsViewModel.justOnce = true
+            }
         }
     }
     //Conrol del botón atrás

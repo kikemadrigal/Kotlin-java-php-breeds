@@ -12,8 +12,8 @@ android {
         applicationId = "es.tipolisto.breeds"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "3.0"
+        versionCode = 4
+        versionName = "3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -52,12 +52,12 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.1")
     //Corrutinas de las activities
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     //Aki detro está el image picker selector de fotos
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation("androidx.activity:activity-compose:1.9.1")
+    implementation(platform("androidx.compose:compose-bom:2024.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -68,7 +68,7 @@ dependencies {
     //CameraX:https://developer.android.com/jetpack/androidx/releases/camera?hl=es-419
     // CameraX core library using the camera2 implementation
     //val camerax_version = "1.4.0-alpha04"
-    val camerax_version = "1.4.0-beta02"
+    val camerax_version = "1.4.0-rc01"
     // The following line is optional, as the core library is included indirectly by camera-camera2
     implementation("androidx.camera:camera-core:${camerax_version}")
     implementation("androidx.camera:camera-camera2:${camerax_version}")
@@ -89,15 +89,15 @@ dependencies {
     //Si no lo pones, esto no los puedes hacer: val email: String by loginViewModel.email.observeAsState(initial = "")
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.8")
     //Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     //implementation ("com.squareup.okhttp3:logging-interceptor:4.4.0")
     //implementation ("com.squareup.okhttp3:okhttp:4.12.0")
     //implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     //implementation ("com.squareup.retrofit2:converter-moshi:2.9.0")
 
     //Iconos a tope
-    implementation ("androidx.compose.material:material-icons-extended:1.6.2")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.8")
 
     //Tabs
     //implementation("com.google.accompanist:accompanist-pager:0.20.0")

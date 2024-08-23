@@ -5,6 +5,7 @@ import es.tipolisto.breeds.data.models.cat.BreedCatTL
 import es.tipolisto.breeds.data.models.cat.CatTL
 import es.tipolisto.breeds.data.network.RetrofitClient
 import es.tipolisto.breeds.data.providers.CatProvider
+import es.tipolisto.breeds.utils.Constants
 import kotlin.random.Random
 
 class CatRepository {
@@ -12,13 +13,16 @@ class CatRepository {
 
         suspend fun loadCatsAndInsertBuffer() {
             try {
+                //https://breeds.tipolisto.es/api/cats.php
                 val service= RetrofitClient.getRetrofitService()
                 val response=service.getAllCats()
                 val listCats=response.body()
+                Log.d("message", "CatRepository ->loadCatsAndInsertBuffer dice: obtenidas de iternet ${listCats?.size} cats")
+                Log.d("message", "CatRepository ->loadCatsAndInsertBuffer dice: response code ${response.code()} cats")
                 if (listCats != null) CatProvider.listCats=listCats
             //}catch (e:IllegalStateException){
             }catch (e:Exception){
-                Log.d("TAG", "loadCatsAndInsertBuffer: "+e.message)
+                Log.d(Constants.TAG, "loadCatsAndInsertBuffer: "+e.message)
             }
 
         }

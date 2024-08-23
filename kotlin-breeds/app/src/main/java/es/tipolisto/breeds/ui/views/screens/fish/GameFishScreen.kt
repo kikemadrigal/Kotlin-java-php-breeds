@@ -83,8 +83,10 @@ fun GameFishScreen(navController: NavController, fishViewModel: FishViewModel, r
     }
     LaunchedEffect(key1 = true){
         if(!fishViewModel.justOnce){
-            fishViewModel.get3RamdomFish()
-            fishViewModel.justOnce=true
+            if (fishViewModel.getAllFish().isNotEmpty() && fishViewModel.getAllSpeciesFish().isNotEmpty()) {
+                fishViewModel.get3RamdomFish()
+                fishViewModel.justOnce = true
+            }
         }
     }
     //Conrol del botón atrás

@@ -13,6 +13,6 @@ class Constants {
         //const val URL_BASE_FISH="https://fish-species.p.rapidapi.com/fish_api/"
         const val URL_BASE_FISH="https://breeds.tipolisto.es/api/specieFish.php"
         const val KEY_API_FISH="mira en los keys"
-        val CAMERAX_PERMISSIONS= arrayOf(Manifest.permission.CAMERA)
+        const val TAG="Message"
     }
 }

@@ -15,7 +15,10 @@ data class CatTL(
     val sex: String,
     val address: String,
     val vaccines: String,
+    val points: Int,
+    val total_points: Int,
     val path_image: String,
+    val validate: Int,
     val date: String,
     val creator_id: String
     )

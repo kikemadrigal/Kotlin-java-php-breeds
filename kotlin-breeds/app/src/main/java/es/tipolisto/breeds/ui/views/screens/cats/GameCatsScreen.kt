@@ -79,8 +79,10 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
     //Esto es para que solo se ejecute 1 vez
     LaunchedEffect(key1 = true){
         if (!catsViewModel.justOnce) {
-            catsViewModel.get3RamdomCats()
-            catsViewModel.justOnce=true
+            if (catsViewModel.getAllCats().isNotEmpty() && catsViewModel.getAllBreedsCats().isNotEmpty()) {
+                catsViewModel.get3RamdomCats()
+                catsViewModel.justOnce = true
+            }
         }
     }
     //Conrol del botón atrás
@@ -134,8 +136,8 @@ fun GameCatScreen(navController: NavController, catsViewModel:CatsViewModel, rec
                 Toast.makeText(context, stringResource(id = R.string.there_was_a_problem_getting_the_data),Toast.LENGTH_LONG).show()
                 navController.popBackStack()
                 navController.navigate(AppScreens.SplashScreen.route)
-            }
-            GameCatScreenContent(it,catsViewModel,recordsViewModel, navController,mediaPlayerClient)
+            }else
+                GameCatScreenContent(it,catsViewModel,recordsViewModel, navController,mediaPlayerClient)
         }
     }
 }

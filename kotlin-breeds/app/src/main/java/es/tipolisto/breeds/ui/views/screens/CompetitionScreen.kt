@@ -80,12 +80,18 @@ import es.tipolisto.breeds.utils.MediaPlayerClient
 @Composable
 fun CompetitionScreen(navController: NavController, competitionViewModel:CompetitionViewModel, recordsViewModel: RecordsViewModel, mediaPlayerClient: MediaPlayerClient) {
     val context= LocalContext.current
-    //if(stateNewRecord) checkNewRecord(context)
+
     //Esto es para que solo se ejecute 1 vez
     LaunchedEffect(key1 = true){
         if (!competitionViewModel.justOnce) {
-            competitionViewModel.get3Ramdom()
-            competitionViewModel.justOnce=true
+            if (competitionViewModel.getAllCats().isNotEmpty() &&
+                competitionViewModel.getAllDogs().isNotEmpty() &&
+                competitionViewModel.getAllBreedsCats().isNotEmpty() &&
+                competitionViewModel.getAllBreedsDogs().isNotEmpty() &&
+                competitionViewModel.getAllFish().isNotEmpty() ) {
+                competitionViewModel.get3Ramdom()
+                competitionViewModel.justOnce = true
+            }
         }
     }
     //Conrol del botón atrás
