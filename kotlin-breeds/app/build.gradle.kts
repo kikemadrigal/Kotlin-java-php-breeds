@@ -8,14 +8,14 @@ plugins {
 
 android {
     namespace = "es.tipolisto.breeds"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "es.tipolisto.breeds"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 5
-        versionName = "3.2"
+        targetSdk = 37
+        versionCode = 7
+        versionName = "3.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
